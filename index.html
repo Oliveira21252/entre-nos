@@ -1,0 +1,1863 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#14101d">
+<title>Entre Nós — Jogos para Casais</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ================= RESET & TOKENS ================= */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg0:#120d1a;--bg1:#1a1226;--bg2:#241731;
+  --card:rgba(255,255,255,.055);--card2:rgba(255,255,255,.085);--cb:rgba(255,255,255,.12);
+  --text:#f6ecf4;--muted:#b3a3c6;--faint:#8b7c9e;
+  --rose:#ff6b8b;--rose2:#ff8fab;--gold:#f2c66d;--lav:#a78bfa;--mint:#5eead4;
+  --shadow:0 18px 50px rgba(0,0,0,.45);
+  --r:22px;
+  --fh:'Playfair Display',Georgia,serif;
+  --fb:'Jost','Segoe UI',system-ui,-apple-system,sans-serif;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--fb);color:var(--text);min-height:100vh;overflow-x:hidden;
+  background:
+    radial-gradient(1100px 750px at 85% -10%,#33203f 0%,transparent 60%),
+    radial-gradient(900px 650px at -10% 105%,#2c1b33 0%,transparent 55%),
+    linear-gradient(160deg,var(--bg0),#171021 55%,#110c18);
+  background-attachment:fixed;
+}
+::selection{background:rgba(255,107,139,.35)}
+::-webkit-scrollbar{width:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:99px}
+button{font-family:inherit;color:inherit;background:none;border:none;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.hidden{display:none!important}
+
+/* ================= FLOATING EMOJIS ================= */
+.floater{position:fixed;z-index:0;pointer-events:none;user-select:none;opacity:.07;filter:drop-shadow(0 18px 18px rgba(0,0,0,.5));animation:floatY 9s ease-in-out infinite alternate}
+.f1{top:8%;left:4%;font-size:110px;animation-delay:0s}
+.f2{top:64%;left:2%;font-size:80px;animation-delay:-3s}
+.f3{top:12%;right:5%;font-size:95px;animation-delay:-5s}
+.f4{bottom:10%;right:7%;font-size:100px;animation-delay:-2s}
+.f5{bottom:36%;left:44%;font-size:70px;animation-delay:-6s}
+.f6{top:40%;right:38%;font-size:64px;animation-delay:-4s}
+@keyframes floatY{from{transform:translateY(-16px) rotate(-5deg)}to{transform:translateY(18px) rotate(6deg)}}
+
+/* ================= 3D EMOJI ================= */
+.emoji3d{
+  display:inline-block;filter:drop-shadow(0 14px 12px rgba(0,0,0,.5)) drop-shadow(0 2px 1px rgba(255,255,255,.14));
+  animation:bob 5.5s ease-in-out infinite;
+}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-10px) rotate(3deg)}}
+
+/* ================= HUD ================= */
+.hud{
+  position:sticky;top:0;z-index:60;display:flex;align-items:center;justify-content:space-between;
+  padding:14px clamp(16px,4vw,42px);
+  background:rgba(18,12,26,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+.logo{font-family:var(--fh);font-weight:700;font-size:20px;letter-spacing:.14em;color:var(--text)}
+.logo b{color:var(--rose2);font-weight:700}
+.hud-right{display:flex;align-items:center;gap:10px}
+.chip-fire{
+  display:flex;align-items:center;gap:7px;padding:8px 15px;border-radius:99px;font-weight:600;
+  background:linear-gradient(120deg,rgba(255,107,139,.18),rgba(242,198,109,.14));
+  border:1px solid rgba(255,138,160,.35);font-size:15px;
+}
+.chip-fire span{font-weight:400;color:var(--muted);font-size:13px}
+.icon-btn{
+  width:40px;height:40px;border-radius:13px;display:grid;place-items:center;font-size:17px;
+  background:var(--card);border:1px solid var(--cb);transition:.2s;
+}
+.icon-btn:hover{background:var(--card2);transform:translateY(-2px)}
+
+/* ================= LAYOUT / SCREENS ================= */
+main{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:0 clamp(16px,4vw,32px) 80px}
+.screen{display:none}
+.screen.active{display:block;animation:screenIn .5s ease both}
+@keyframes screenIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+
+/* ================= HERO ================= */
+.hero{text-align:center;padding:clamp(38px,7vh,72px) 0 10px}
+.hero-emojis{display:flex;justify-content:center;gap:22px;margin-bottom:18px;font-size:54px}
+.hero-emojis .e2{font-size:42px;animation-delay:-1.8s}
+.hero-emojis .e3{font-size:46px;animation-delay:-3.4s}
+.kicker{letter-spacing:.34em;text-transform:uppercase;font-size:12px;color:var(--gold);font-weight:600;margin-bottom:14px}
+h1{font-family:var(--fh);font-weight:800;font-size:clamp(34px,6vw,58px);line-height:1.08;letter-spacing:-.01em}
+h1 em{font-style:italic;background:linear-gradient(100deg,var(--rose2),var(--gold) 70%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{max-width:640px;margin:18px auto 0;color:var(--muted);font-size:clamp(15px,2vw,17.5px);line-height:1.65;font-weight:300}
+.hero-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:24px}
+.pill{padding:8px 16px;border-radius:99px;font-size:13.5px;font-weight:500;background:var(--card);border:1px solid var(--cb)}
+
+/* ================= GAME CARDS ================= */
+.game-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:18px;margin-top:34px}
+.gcard{
+  position:relative;background:var(--card);border:1px solid var(--cb);border-radius:26px;
+  padding:28px 24px 24px;cursor:pointer;overflow:hidden;text-align:left;
+  transition:transform .28s,border-color .28s,box-shadow .28s;
+}
+.gcard:hover{transform:translateY(-7px);border-color:rgba(255,138,160,.55);box-shadow:0 24px 54px rgba(0,0,0,.5)}
+.gcard::before{content:'';position:absolute;top:-70px;right:-70px;width:190px;height:190px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,107,139,.2),transparent 70%);pointer-events:none}
+.g-emoji{font-size:52px;margin-bottom:14px}
+.gcard h3{font-family:var(--fh);font-size:23px;font-weight:700;margin-bottom:9px}
+.gcard p{color:var(--muted);font-size:14.5px;line-height:1.6;font-weight:300;min-height:70px}
+.gcard b{color:var(--rose2);font-weight:600}
+.tags{display:flex;flex-wrap:wrap;gap:7px;margin:13px 0 15px}
+.tags span{font-size:11.5px;letter-spacing:.04em;padding:5px 11px;border-radius:99px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--faint);text-transform:uppercase;font-weight:500}
+.g-cta{color:var(--gold);font-weight:600;font-size:14.5px;letter-spacing:.02em}
+
+/* ================= STATS & BADGES ================= */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:34px}
+.stat{background:var(--card);border:1px solid var(--cb);border-radius:20px;padding:18px;text-align:center}
+.s-num{font-family:var(--fh);font-size:30px;font-weight:700;background:linear-gradient(100deg,var(--rose2),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.s-l{font-size:12.5px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-top:4px}
+.home-sec{margin-top:44px}
+.sec-title{font-family:var(--fh);font-size:22px;font-weight:700;margin-bottom:16px}
+.badge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:12px}
+.badge{background:var(--card);border:1px solid var(--cb);border-radius:18px;padding:16px 12px;text-align:center;transition:.25s}
+.badge:not(.locked):hover{border-color:rgba(242,198,109,.5);transform:translateY(-3px)}
+.badge.locked{opacity:.38;filter:grayscale(.95)}
+.b-ic{font-size:31px;filter:drop-shadow(0 8px 9px rgba(0,0,0,.45))}
+.b-n{font-weight:600;font-size:14px;margin-top:8px}
+.b-d{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.45;min-height:32px}
+.home-foot{margin-top:46px;text-align:center;color:var(--faint);font-size:13.5px;line-height:1.7;font-weight:300;padding:0 12px}
+
+/* ================= GAME HEADERS ================= */
+.game-head{padding:30px 0 8px;text-align:center}
+.game-head h2{font-family:var(--fh);font-size:clamp(26px,4vw,38px);font-weight:800}
+.game-head .sub{color:var(--muted);font-size:15px;margin-top:8px;font-weight:300;max-width:560px;margin-left:auto;margin-right:auto;line-height:1.6}
+.back-btn{display:inline-flex;align-items:center;gap:7px;margin-bottom:16px;padding:9px 18px;border-radius:99px;background:var(--card);border:1px solid var(--cb);font-size:13.5px;font-weight:500;transition:.2s}
+.back-btn:hover{background:var(--card2)}
+.mind-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:99px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);background:rgba(242,198,109,.1);border:1px solid rgba(242,198,109,.3)}
+
+/* ================= BUTTONS ================= */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 26px;border-radius:99px;font-weight:600;font-size:15px;letter-spacing:.02em;
+  background:linear-gradient(120deg,var(--rose),#ff9068);color:#fff;
+  box-shadow:0 10px 28px rgba(255,107,139,.3);transition:.22s;border:1px solid transparent;
+}
+.btn:hover{transform:translateY(-3px);box-shadow:0 16px 36px rgba(255,107,139,.42)}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.btn.ghost{background:var(--card);border:1px solid var(--cb);color:var(--text);box-shadow:none}
+.btn.ghost:hover{background:var(--card2);border-color:rgba(255,255,255,.25)}
+.btn.gold{background:linear-gradient(120deg,var(--gold),#f5a65b);color:#241703;box-shadow:0 10px 28px rgba(242,198,109,.28)}
+.btn.mint{background:linear-gradient(120deg,#3ec9a7,var(--mint));color:#0b2420;box-shadow:0 10px 28px rgba(94,234,212,.24)}
+.btn.small{padding:9px 18px;font-size:13.5px}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+
+/* ================= PROGRESS ================= */
+.progress{height:8px;border-radius:99px;background:rgba(255,255,255,.09);overflow:hidden}
+.progress i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--rose),var(--gold));transition:width .5s ease}
+
+/* ================= DESEJOS: LEVELS ================= */
+.level-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:15px;margin-top:26px}
+.level-card{
+  position:relative;background:var(--card);border:1px solid var(--cb);border-radius:24px;
+  padding:24px 20px;cursor:pointer;text-align:left;transition:.25s;overflow:hidden;
+}
+.level-card:hover:not(.locked){transform:translateY(-5px);border-color:rgba(255,138,160,.5);box-shadow:0 18px 40px rgba(0,0,0,.4)}
+.level-card.l-gold{border-color:rgba(242,198,109,.35);background:linear-gradient(150deg,rgba(242,198,109,.08),rgba(255,255,255,.03))}
+.level-card .l-ic{font-size:40px}
+.level-card h4{font-family:var(--fh);font-size:20px;margin:10px 0 5px}
+.level-card p{font-size:13px;color:var(--muted);line-height:1.55;font-weight:300}
+.level-card .l-lock{margin-top:12px;font-size:12px;color:var(--gold);font-weight:600;letter-spacing:.03em}
+.level-card.locked{opacity:.55}
+.level-card.locked .l-ic{filter:grayscale(1)}
+.level-card .l-prog{margin-top:13px}
+
+/* ================= DESEJOS: DECK & FLIP CARD ================= */
+.deck-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:24px 0 20px}
+.deck-top .dt-info{display:flex;align-items:center;gap:14px;flex:1;min-width:220px}
+.deck-top .progress{flex:1;min-width:140px}
+.deck-count{font-size:13px;color:var(--muted);white-space:nowrap;font-weight:500}
+.flip{position:relative;perspective:1600px;max-width:470px;margin:0 auto;user-select:none}
+.flip-inner{position:relative;height:440px;transform-style:preserve-3d;transition:transform .85s cubic-bezier(.18,.74,.22,1)}
+.flip.revealed .flip-inner{transform:rotateY(180deg)}
+.face{
+  position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  border-radius:28px;padding:30px 28px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;text-align:center;overflow:hidden;
+}
+.face.front{
+  cursor:pointer;
+  background:linear-gradient(150deg,#2d1d3e,#1c1228 55%,#261833);
+  border:1px solid rgba(242,198,109,.4);
+  box-shadow:var(--shadow);
+}
+.face.front::after{content:'';position:absolute;inset:0;border-radius:28px;pointer-events:none;
+  background:linear-gradient(115deg,transparent 32%,rgba(255,255,255,.07) 46%,transparent 60%);
+  background-size:260% 100%;animation:sheen 3.4s linear infinite}
+@keyframes sheen{from{background-position:130% 0}to{background-position:-130% 0}}
+.face.front .fm{font-family:var(--fh);font-size:15px;letter-spacing:.42em;color:var(--gold);font-weight:600}
+.face.front .f-star{font-size:46px;filter:drop-shadow(0 10px 14px rgba(242,198,109,.35))}
+.face.front .f-tap{font-size:12.5px;color:var(--faint);letter-spacing:.14em;text-transform:uppercase}
+.face.back{
+  transform:rotateY(180deg);
+  background:linear-gradient(160deg,rgba(255,255,255,.085),rgba(255,255,255,.04));
+  border:1px solid rgba(255,255,255,.16);box-shadow:var(--shadow);justify-content:center;gap:16px;
+}
+.t-type{display:inline-flex;align-items:center;gap:7px;padding:7px 16px;border-radius:99px;font-size:12.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.t-v{background:rgba(167,139,250,.16);color:#c8b4ff;border:1px solid rgba(167,139,250,.4)}
+.t-e{background:rgba(242,198,109,.14);color:var(--gold);border:1px solid rgba(242,198,109,.4)}
+.t-m{background:rgba(255,107,139,.15);color:var(--rose2);border:1px solid rgba(255,107,139,.4)}
+.t-p{background:rgba(94,234,212,.13);color:var(--mint);border:1px solid rgba(94,234,212,.4)}
+.t-text{font-family:var(--fh);font-size:clamp(18px,2.6vw,21.5px);line-height:1.5;font-weight:600}
+.t-sub{font-size:13.5px;color:var(--muted);line-height:1.55;font-weight:300}
+.t-mini{font-size:12px;color:var(--faint);letter-spacing:.06em;text-transform:uppercase}
+.mech{max-width:470px;margin:20px auto 0;display:flex;flex-direction:column;gap:12px;animation:screenIn .4s ease}
+.mech-hint{font-size:12.5px;color:var(--faint);text-align:center;font-weight:300;line-height:1.5}
+.mech-steps{background:var(--card);border:1px solid var(--cb);border-radius:18px;padding:14px 18px;text-align:left;font-size:13.5px;color:var(--muted);line-height:1.7;font-weight:300}
+.mech-steps b{color:var(--text);font-weight:600}
+.deck-done{text-align:center;padding:40px 0}
+.deck-done .emoji3d{font-size:64px}
+
+/* ================= ENIGMAS / VAULT ================= */
+.riddle-item{background:var(--card);border:1px solid var(--cb);border-radius:20px;padding:20px;margin-bottom:14px}
+.riddle-item.solved{border-color:rgba(94,234,212,.4);background:rgba(94,234,212,.05)}
+.riddle-q{font-family:var(--fh);font-size:16.5px;line-height:1.55;font-weight:600;margin-bottom:14px}
+.riddle-row{display:flex;gap:10px}
+.riddle-row input{
+  flex:1;padding:11px 16px;border-radius:99px;border:1px solid var(--cb);background:rgba(0,0,0,.25);
+  color:var(--text);font-family:inherit;font-size:14px;
+}
+.riddle-row input::placeholder{color:var(--faint)}
+.shake{animation:shake .4s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+
+/* ================= SENTIDOS ================= */
+.sense-tabs{display:flex;gap:10px;margin:26px 0 22px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none}
+.sense-tabs::-webkit-scrollbar{display:none}
+.tab{
+  display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 18px;min-width:108px;
+  border-radius:20px;background:var(--card);border:1px solid var(--cb);transition:.22s;flex-shrink:0;
+}
+.tab:hover{background:var(--card2)}
+.tab.active{background:linear-gradient(140deg,rgba(255,107,139,.2),rgba(242,198,109,.12));border-color:rgba(255,138,160,.55);transform:translateY(-3px)}
+.tab .tab-ic{font-size:27px}
+.tab .tab-n{font-size:13px;font-weight:600;letter-spacing:.03em}
+.sense-dots{display:flex;gap:4px}
+.sense-dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.18)}
+.sense-dots i.on{background:var(--gold);box-shadow:0 0 8px rgba(242,198,109,.7)}
+.mission-list{display:flex;flex-direction:column;gap:13px}
+.mission-card{
+  display:flex;align-items:center;gap:17px;text-align:left;width:100%;
+  background:var(--card);border:1px solid var(--cb);border-radius:22px;padding:19px 21px;transition:.22s;
+}
+.mission-card:hover:not(.locked){background:var(--card2);border-color:rgba(255,138,160,.45);transform:translateX(5px)}
+.mission-card .m-num{
+  width:46px;height:46px;border-radius:15px;display:grid;place-items:center;flex-shrink:0;
+  font-family:var(--fh);font-weight:700;font-size:19px;
+  background:linear-gradient(140deg,rgba(255,107,139,.22),rgba(242,198,109,.14));border:1px solid rgba(255,138,160,.3);
+}
+.mission-card .m-body{flex:1}
+.mission-card h4{font-size:16.5px;font-weight:600;margin-bottom:3px}
+.mission-card p{font-size:13px;color:var(--muted);line-height:1.5;font-weight:300}
+.mission-card .m-st{font-size:20px;flex-shrink:0}
+.mission-card.locked{opacity:.5}
+.mission-card.locked .m-num{filter:grayscale(1)}
+.mission-card.done .m-num{background:linear-gradient(140deg,rgba(94,234,212,.25),rgba(94,234,212,.1));border-color:rgba(94,234,212,.4)}
+
+/* ================= STEPS / SYNC / MINI-GAMES ================= */
+.steps{margin:14px 0;padding-left:22px;display:flex;flex-direction:column;gap:9px}
+.steps li{font-size:14.5px;line-height:1.6;color:var(--muted);font-weight:300;padding-left:4px}
+.steps li b{color:var(--text);font-weight:600}
+.mind-label{display:flex;align-items:center;gap:8px;margin:18px 0 10px;font-size:12.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+.mind-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(242,198,109,.4),transparent)}
+.sync-q{font-family:var(--fh);font-size:18.5px;font-weight:600;line-height:1.5;margin:8px 0}
+.sync-hint{font-size:13px;color:var(--faint);margin-bottom:16px;font-weight:300}
+.divider{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.16),transparent);margin:20px 0}
+.pads{display:grid;grid-template-columns:repeat(2,minmax(88px,116px));gap:13px;justify-content:center;margin:14px auto;user-select:none}
+.pad{aspect-ratio:1;border-radius:22px;cursor:pointer;opacity:.3;transition:opacity .14s,transform .14s,box-shadow .14s;border:2px solid rgba(255,255,255,.16);background:var(--c)}
+.pad:hover{opacity:.55}
+.pad.lit{opacity:1;transform:scale(1.08);box-shadow:0 0 36px var(--c)}
+.sg-status{text-align:center;font-size:13.5px;color:var(--muted);min-height:22px;margin:8px 0 12px;font-weight:400}
+.egrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:14px 0;user-select:none}
+.ecell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:clamp(22px,5vw,32px);background:var(--card);border:1px solid var(--cb);border-radius:14px;transition:.2s}
+.egrid .hintcell{border-color:rgba(242,198,109,.45);background:rgba(242,198,109,.07)}
+.e-status{text-align:center;font-size:13.5px;color:var(--muted);min-height:22px;margin-bottom:8px}
+.eq-prompt{font-family:var(--fh);font-size:17.5px;font-weight:600;text-align:center;margin:12px 0 14px;line-height:1.5}
+.e-opts{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.e-opt{padding:13px 8px;border-radius:14px;background:var(--card);border:1px solid var(--cb);font-size:24px;transition:.2s}
+.e-opt:hover{background:var(--card2);transform:translateY(-2px)}
+.e-opt.right{background:rgba(94,234,212,.16);border-color:rgba(94,234,212,.5)}
+.e-opt.wrongp{background:rgba(255,107,139,.14);border-color:rgba(255,107,139,.45)}
+
+/* ================= TIMER ================= */
+.timer{text-align:center;margin:16px 0}
+.t-time{font-family:var(--fh);font-size:52px;font-weight:700;font-variant-numeric:tabular-nums;background:linear-gradient(100deg,var(--rose2),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.t-time.big{font-size:76px}
+.t-btns{display:flex;gap:10px;justify-content:center;margin-top:10px}
+
+/* ================= MOVIMENTO ================= */
+.mv-tabs{display:flex;gap:10px;margin:24px 0 20px;flex-wrap:wrap}
+.mv-tabs .tab{flex-direction:row;min-width:0;padding:12px 22px;align-items:center;gap:9px}
+.ex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:15px}
+.ex-card{
+  display:grid;grid-template-columns:132px 1fr;gap:14px;text-align:left;
+  background:var(--card);border:1px solid var(--cb);border-radius:22px;padding:15px;transition:.24s;
+}
+.ex-card:hover{transform:translateY(-5px);border-color:rgba(167,139,250,.5);box-shadow:0 18px 40px rgba(0,0,0,.4)}
+.ex-card.done-ex{border-color:rgba(94,234,212,.35)}
+.svg-art{background:radial-gradient(110px 85px at 50% 45%,rgba(167,139,250,.15),transparent 72%),rgba(255,255,255,.035);border-radius:15px;display:flex;align-items:center;justify-content:center;padding:6px}
+.svg-art svg{width:122px;height:auto}
+.s-lav{stroke:#b8a3ff;fill:none;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.s-rose{stroke:#ff8fab;fill:none;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.s-gold{stroke:#f2c66d;fill:none;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.s-mint{stroke:#5eead4;fill:none;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.g-line{stroke:rgba(255,255,255,.16);stroke-width:3;stroke-linecap:round}
+.arr{stroke:#f2c66d;stroke-width:3;fill:none;stroke-dasharray:2 7;stroke-linecap:round}
+.ang{stroke:#f2c66d;stroke-width:2;fill:none;opacity:.85}
+.svgt{fill:#b3a3c6;font-size:11px;font-family:var(--fb);font-weight:500}
+.ex-info h4{font-size:16px;font-weight:600;margin-bottom:5px;padding-right:6px}
+.ex-info .ex-meta{font-size:11.5px;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+.ex-info p{font-size:12.5px;color:var(--muted);line-height:1.5;font-weight:300;margin-top:5px}
+.ex-done-flag{font-size:11px;color:var(--mint);font-weight:600;letter-spacing:.05em;margin-top:6px}
+.modal-art{display:flex;justify-content:center;margin:6px 0 14px}
+.modal-art .svg-art{width:230px;height:150px}
+.modal-art svg{width:200px}
+.tecnica-box{background:rgba(167,139,250,.09);border:1px solid rgba(167,139,250,.3);border-radius:16px;padding:14px 17px;font-size:13.5px;line-height:1.6;color:var(--muted);margin:12px 0;font-weight:300}
+.tecnica-box b{color:#c8b4ff;font-weight:600}
+.adapt-box{background:var(--card);border:1px solid var(--cb);border-radius:16px;padding:14px 17px;margin-bottom:6px}
+.adapt-box h5{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--mint);margin-bottom:8px}
+.adapt-box li{font-size:13px;color:var(--muted);line-height:1.6;margin-left:16px;font-weight:300}
+
+/* ================= QUIZ ================= */
+.quiz-wrap{max-width:560px;margin:0 auto}
+.quiz-prog{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.quiz-prog .progress{flex:1}
+.quiz-prog span{font-size:13px;color:var(--muted);font-weight:500;white-space:nowrap}
+.quiz-q{font-family:var(--fh);font-size:21px;font-weight:600;line-height:1.5;margin-bottom:20px;text-align:center}
+.quiz-opts{display:flex;flex-direction:column;gap:10px}
+.quiz-opt{
+  padding:15px 20px;border-radius:17px;background:var(--card);border:1px solid var(--cb);
+  font-size:15px;font-weight:400;text-align:left;transition:.2s;line-height:1.45;
+}
+.quiz-opt:hover:not(:disabled){background:var(--card2);transform:translateX(4px)}
+.quiz-opt:disabled{cursor:default}
+.quiz-opt.correct{background:rgba(94,234,212,.16);border-color:rgba(94,234,212,.55)}
+.quiz-opt.wrong{background:rgba(255,107,139,.13);border-color:rgba(255,107,139,.5)}
+.quiz-why{margin-top:16px;background:rgba(242,198,109,.07);border:1px solid rgba(242,198,109,.3);border-radius:16px;padding:15px 18px;font-size:13.5px;line-height:1.65;color:var(--muted);animation:screenIn .35s ease}
+.quiz-why b{color:var(--gold)}
+.quiz-end{text-align:center;padding:20px 0}
+.quiz-score{font-family:var(--fh);font-size:64px;font-weight:800;background:linear-gradient(100deg,var(--rose2),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* ================= MODAL ================= */
+.modal{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:18px}
+.modal.hidden{display:none}
+.modal-back{position:absolute;inset:0;background:rgba(9,5,15,.74);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+.modal-box{
+  position:relative;width:min(620px,100%);max-height:88vh;overflow-y:auto;
+  background:linear-gradient(165deg,#281b38,#1b1227);border:1px solid rgba(255,255,255,.15);
+  border-radius:26px;padding:28px 26px;box-shadow:var(--shadow);
+  animation:pop .38s cubic-bezier(.2,.9,.3,1.15);
+}
+@keyframes pop{from{transform:translateY(26px) scale(.95);opacity:0}}
+.modal-box h3{font-family:var(--fh);font-size:24px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.modal-box .m-desc{color:var(--muted);font-size:14px;line-height:1.65;font-weight:300;margin-bottom:8px}
+.modal-close{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:12px;background:var(--card);border:1px solid var(--cb);display:grid;place-items:center;font-size:15px;transition:.2s;z-index:2}
+.modal-close:hover{background:var(--card2)}
+.done-box{text-align:center;padding:14px 0}
+.done-box .emoji3d{font-size:62px;margin-bottom:10px}
+
+/* ================= TOASTS ================= */
+#toasts{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:130;display:flex;flex-direction:column-reverse;gap:9px;pointer-events:none;width:max-content;max-width:92vw}
+.toast{
+  display:flex;align-items:center;gap:10px;background:rgba(30,19,44,.94);border:1px solid rgba(255,138,160,.42);
+  padding:12px 20px;border-radius:99px;font-weight:500;font-size:14px;box-shadow:var(--shadow);
+  opacity:0;transform:translateY(16px);transition:.35s;max-width:92vw;
+}
+.toast.show{opacity:1;transform:none}
+.toast .t-ic{font-size:17px}
+.toast.ach{border-color:rgba(242,198,109,.6);background:linear-gradient(120deg,#37254d,#251a33)}
+
+/* ================= ROLETA DO PRAZER ================= */
+.roleta-stage{text-align:center;padding:8px 0 4px}
+.wheel-zone{position:relative;width:min(80vw,330px);margin:26px auto 0}
+.wheel{
+  width:100%;aspect-ratio:1;border-radius:50%;position:relative;overflow:hidden;
+  border:5px solid rgba(242,198,109,.55);
+  box-shadow:0 20px 50px rgba(0,0,0,.5),0 0 0 8px rgba(255,255,255,.045),0 0 44px rgba(242,198,109,.14);
+  transition:transform 4.2s cubic-bezier(.15,.82,.18,1);
+  background:conic-gradient(from 0deg,#5eead4 0deg 60deg,#ff8fab 60deg 120deg,#a78bfa 120deg 180deg,#f2c66d 180deg 240deg,#ff6b8b 240deg 300deg,#d84f72 300deg 360deg);
+  will-change:transform;
+}
+.wheel::after{content:'';position:absolute;inset:0;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle at 50% 50%,rgba(18,12,26,0) 58%,rgba(18,12,26,.3) 100%)}
+.wl{position:absolute;top:3%;left:50%;height:47%;width:82px;margin-left:-41px;transform:rotate(var(--a));transform-origin:50% 100%;display:flex;flex-direction:column;align-items:center;gap:1px;pointer-events:none}
+.we{font-size:clamp(20px,6vw,27px);filter:drop-shadow(0 4px 5px rgba(0,0,0,.35))}
+.wt{font-size:10px;font-weight:700;letter-spacing:.03em;color:#241703;text-transform:uppercase;text-align:center;line-height:1.2}
+.wheel-pointer{position:absolute;top:-20px;left:50%;transform:translateX(-50%);z-index:5;font-size:28px;color:var(--gold);filter:drop-shadow(0 5px 7px rgba(0,0,0,.55))}
+.wheel-hub{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:6;
+  width:92px;height:92px;border-radius:50%;display:grid;place-items:center;
+  font-family:var(--fh);font-weight:800;font-size:15px;letter-spacing:.08em;color:#241703;
+  background:linear-gradient(140deg,var(--gold),#f5a65b);border:4px solid rgba(255,255,255,.9);
+  box-shadow:0 10px 26px rgba(0,0,0,.5),0 0 0 6px rgba(242,198,109,.18);transition:.2s;
+}
+.wheel-hub:hover:not(:disabled){transform:translate(-50%,-50%) scale(1.07)}
+.wheel-hub:disabled{opacity:.6;cursor:wait}
+.roleta-info{margin-top:20px;font-size:14px;color:var(--muted)}
+.roleta-info b{color:var(--gold);font-weight:600}
+
+/* ================= ACADEMIA / DESBLOQUEIE ================= */
+.acad-head{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin:20px 0 22px}
+.acad-head .progress{width:min(260px,64vw)}
+.quiz-opt.chosen{background:rgba(242,198,109,.12);border-color:rgba(242,198,109,.55)}
+.journey{position:relative;max-width:620px;margin:22px auto 0}
+.jnode{position:relative;padding:0 0 20px 62px;cursor:pointer;text-align:left}
+.jnode::before{content:'';position:absolute;left:20px;top:48px;bottom:2px;width:3px;border-radius:3px;background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.05))}
+.jnode:last-child{padding-bottom:4px}
+.jnode:last-child::before{display:none}
+.j-dot{position:absolute;left:0;top:2px;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-size:19px;background:var(--card);border:1px solid var(--cb);z-index:1;transition:.25s}
+.j-node-body{background:var(--card);border:1px solid var(--cb);border-radius:20px;padding:16px 18px;transition:.25s}
+.j-node-body h4{font-family:var(--fh);font-size:18px;font-weight:700;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.j-node-body p{font-size:12.5px;color:var(--muted);line-height:1.55;font-weight:300;margin-top:5px}
+.jnode:hover:not(.locked) .j-node-body{border-color:rgba(255,138,160,.5);transform:translateX(6px);background:var(--card2)}
+.jnode.done .j-dot{background:linear-gradient(140deg,var(--gold),#f5a65b);border-color:transparent;color:#241703}
+.jnode.cur .j-dot{border-color:var(--rose2);animation:pulseJ 2.2s ease-in-out infinite}
+@keyframes pulseJ{0%,100%{box-shadow:0 0 0 5px rgba(255,107,139,.14)}50%{box-shadow:0 0 0 10px rgba(255,107,139,.05)}}
+.jnode.locked{opacity:.55;cursor:default}
+.jnode.locked .j-dot{filter:grayscale(1)}
+
+/* ================= RESPONSIVE / MOTION ================= */
+@media (max-width:560px){
+  .face.front .fm{font-size:12px;letter-spacing:.3em}
+  .flip-inner{height:400px}
+  .ex-card{grid-template-columns:104px 1fr}
+  .modal-box{padding:22px 18px}
+  .t-time{font-size:44px}
+  .wl{width:64px;margin-left:-32px}
+  .wt{font-size:9px}
+  .wheel-hub{width:76px;height:76px;font-size:13px}
+  .wheel-pointer{font-size:24px;top:-16px}
+  .jnode{padding-left:54px}
+  .jnode::before{left:17px}
+  .j-dot{width:36px;height:36px;font-size:15px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+<div class="floater f1">🃏</div><div class="floater f2">💌</div><div class="floater f3">🔥</div>
+<div class="floater f4">👁️</div><div class="floater f5">🤸</div><div class="floater f6">🌹</div>
+
+<header class="hud">
+  <button class="logo" id="btn-home">✦ <b>ENTRE</b> NÓS</button>
+  <div class="hud-right">
+    <div class="chip-fire">🔥 <b id="hud-points">0</b><span>sintonia</span></div>
+    <button class="icon-btn" id="btn-mute" title="Sons">🔊</button>
+    <button class="icon-btn" id="btn-reset" title="Recomeçar do zero">↺</button>
+  </div>
+</header>
+
+<main>
+  <!-- ============ HOME ============ -->
+  <section id="screen-home" class="screen active">
+    <div class="hero">
+      <div class="hero-emojis">
+        <span class="emoji3d">🃏</span><span class="emoji3d e2">👁️</span><span class="emoji3d e3">🤸</span><span class="emoji3d" style="animation-delay:-4.6s">🎡</span><span class="emoji3d" style="animation-delay:-2.2s">🎓</span>
+      </div>
+      <div class="kicker">✦ Coleção para dois</div>
+      <h1>Jogos para <em>acender</em> a sintonia</h1>
+      <p class="lead">Sete experiências que desafiam a memória, a intuição, o corpo e a mente. Cartas que preveem respostas, roleta de surpresas, mini-games, academia de conhecimento e jornadas que desbloqueiam técnicas — uma noite inteira em uma única página.</p>
+      <div class="hero-chips">
+        <span class="pill">💜 Feito para dois</span>
+        <span class="pill">🧠 Desafios de mente</span>
+        <span class="pill">🔥 Níveis progressivos</span>
+        <span class="pill">🎡 Sorte &amp; surpresas</span>
+      </div>
+    </div>
+
+    <div class="game-cards">
+      <article class="gcard" data-open="desejos">
+        <div class="g-emoji emoji3d">🃏</div>
+        <h3>Desejos Secretos</h3>
+        <p>Verdades, dilemas impossíveis e missões — onde <b>prever</b> a resposta do outro vale mais que respondê-la. E o Cofre Dourado só abre com enigmas decifrados.</p>
+        <div class="tags"><span>2+ jogadores</span><span>Fagulha → Brasa</span><span>Enigmas</span></div>
+        <div class="g-cta">Abrir o baralho →</div>
+      </article>
+      <article class="gcard" data-open="sentidos">
+        <div class="g-emoji emoji3d">👁️</div>
+        <h3>Desafio dos Cinco Sentidos</h3>
+        <p>15 missões sensoriais em 3 níveis: memória visual, Eco do Ritmo, texturas anônimas e perguntas sincronizadas no <b>contador de 3</b>.</p>
+        <div class="tags"><span>Progressivo</span><span>Mini-games</span><span>Timers</span></div>
+        <div class="g-cta">Despertar os sentidos →</div>
+      </article>
+      <article class="gcard" data-open="movimento">
+        <div class="g-emoji emoji3d">🤸</div>
+        <h3>Movimento &amp; Sintonia</h3>
+        <p>Desafios de movimento a dois com anatomia de verdade: <b>ângulos, postura e adaptações</b> para cada corpo, mais um quiz que derruba mitos.</p>
+        <div class="tags"><span>Educativo</span><span>Quiz do corpo</span><span>Recordes</span></div>
+        <div class="g-cta">Entrar em movimento →</div>
+      </article>
+      <article class="gcard" data-open="seducao">
+        <div class="g-emoji emoji3d">💋</div>
+        <h3>Arte da Sedução</h3>
+        <p>Descoberta e conexão em 5 etapas — comunicação, clima, desejos, limites e conexão — com <b>cartas surpresa, situações a dois</b> e desafios leves. Cada etapa libera a próxima.</p>
+        <div class="tags"><span>Descoberta</span><span>5 etapas</span><span>Situações</span></div>
+        <div class="g-cta">Entrar na jornada →</div>
+      </article>
+      <article class="gcard" data-open="roleta">
+        <div class="g-emoji emoji3d">🎡</div>
+        <h3>Roleta do Prazer</h3>
+        <p>Diversão rápida: gire a roleta, revele a surpresa e decida cumprir o desafio. Sentidos, carinho, conexão, comunicação, desafios — e a <b>Coroa Real</b>, que vale duplo.</p>
+        <div class="tags"><span>2+ jogadores</span><span>6 categorias</span><span>Surpresas</span></div>
+        <div class="g-cta">Girar a roleta →</div>
+      </article>
+      <article class="gcard" data-open="academia">
+        <div class="g-emoji emoji3d">🎓</div>
+        <h3>Academia da Intimidade</h3>
+        <p>Simulador educativo sobre consentimento, anatomia, prevenção, lubrificação e prazer — <b>pequenas missões, XP e níveis</b> acadêmicos, com curiosidades que surpreendem.</p>
+        <div class="tags"><span>Educativo</span><span>6 módulos</span><span>XP e níveis</span></div>
+        <div class="g-cta">Entrar na academia →</div>
+      </article>
+      <article class="gcard" data-open="desbloqueio">
+        <div class="g-emoji emoji3d">🔓</div>
+        <h3>Desbloqueie a Intimidade</h3>
+        <p>Uma jornada em 6 fases com selos e níveis de conhecimento: cada etapa ensina algo novo e <b>libera técnicas, conteúdos e desafios</b> para o casal.</p>
+        <div class="tags"><span>Fases</span><span>Selos</span><span>Técnicas</span></div>
+        <div class="g-cta">Começar a jornada →</div>
+      </article>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat"><div class="s-num" id="stat-cards">0</div><div class="s-l">Cartas jogadas</div></div>
+      <div class="stat"><div class="s-num" id="stat-mind">0</div><div class="s-l">Acertos de mente</div></div>
+      <div class="stat"><div class="s-num" id="stat-simon">0</div><div class="s-l">Eco do Ritmo (nível)</div></div>
+      <div class="stat"><div class="s-num" id="stat-bal">0s</div><div class="s-l">Recorde de equilíbrio</div></div>
+      <div class="stat"><div class="s-num" id="stat-roleta">0</div><div class="s-l">Rodadas na Roleta</div></div>
+      <div class="stat"><div class="s-num" id="stat-acad">0</div><div class="s-l">XP da Academia</div></div>
+    </div>
+
+    <div class="home-sec">
+      <h2 class="sec-title">✦ Conquistas</h2>
+      <div class="badge-grid" id="ach-grid"></div>
+    </div>
+
+    <footer class="home-foot">Com consentimento, tudo flui melhor: combinem limites, respeitem o "não" e lembrem-se — pausar também é jogar. 💜</footer>
+  </section>
+
+  <!-- ============ DESEJOS SECRETOS ============ -->
+  <section id="screen-desejos" class="screen">
+    <div class="game-head">
+      <button class="back-btn" data-back>← Início</button>
+      <h2>🃏 Desejos Secretos</h2>
+      <p class="sub">Cada carta é uma provocação. Nos dilemas, escolham em segredo e revelem juntos — <b style="color:var(--gold)">acertar a mente do outro vale mais</b>. Suba de nível e desconfie do Cofre Dourado.</p>
+    </div>
+    <div id="dj-levels"></div>
+    <div id="deck-area" class="hidden"></div>
+  </section>
+
+  <!-- ============ CINCO SENTIDOS ============ -->
+  <section id="screen-sentidos" class="screen">
+    <div class="game-head">
+      <button class="back-btn" data-back>← Início</button>
+      <h2>👁️ Desafio dos Cinco Sentidos</h2>
+      <p class="sub">Cinco sentidos, três níveis cada. Complete uma missão para abrir a próxima — e termine todas as missões com uma <b style="color:var(--gold)">Pergunta Sincro</b>, respondida pelos dois ao mesmo tempo.</p>
+    </div>
+    <div id="sense-tabs" class="sense-tabs"></div>
+    <div id="sense-content"></div>
+  </section>
+
+  <!-- ============ MOVIMENTO & SINTONIA ============ -->
+  <section id="screen-movimento" class="screen">
+    <div class="game-head">
+      <button class="back-btn" data-back>← Início</button>
+      <h2>🤸 Movimento &amp; Sintonia</h2>
+      <p class="sub">Desafios com anatomia real: ângulos, técnica e adaptações para diferentes corpos. Depois, prove que seu cérebro conhece o próprio corpo no <b style="color:var(--gold)">Quiz do Corpo</b>.</p>
+    </div>
+    <div id="mv-tabs" class="mv-tabs"></div>
+    <div id="mv-content"></div>
+  </section>
+
+  <!-- ============ ARTE DA SEDUÇÃO ============ -->
+  <section id="screen-seducao" class="screen">
+    <div class="game-head">
+      <button class="back-btn" data-back>← Início</button>
+      <h2>💋 Arte da Sedução</h2>
+      <p class="sub">Descoberta e conexão em 5 etapas de intimidade: comunicação, clima, desejos, limites e conexão. Cartas surpresa, <b style="color:var(--gold)">situações para refletir a dois</b> e desafios leves — cada etapa vivida libera a próxima.</p>
+    </div>
+    <div id="sed-wrap"></div>
+  </section>
+
+  <!-- ============ ROLETA DO PRAZER ============ -->
+  <section id="screen-roleta" class="screen">
+    <div class="game-head">
+      <button class="back-btn" data-back>← Início</button>
+      <h2>🎡 Roleta do Prazer</h2>
+      <p class="sub">Diversão rápida: gire, revele a surpresa e decida se cumpre o desafio. Sentidos, carinho, conexão, comunicação, desafios — e a temida <b style="color:var(--gold)">Coroa Real</b>.</p>
+    </div>
+    <div id="roleta-wrap"></div>
+  </section>
+
+  <!-- ============ ACADEMIA DA INTIMIDADE ============ -->
+  <section id="screen-academia" class="screen">
+    <div class="game-head">
+      <button class="back-btn" data-back>← Início</button>
+      <h2>🎓 Academia da Intimidade</h2>
+      <p class="sub">Simulador educativo: consentimento, anatomia, prevenção, lubrificação, resposta sexual e mitos. Cada acerto vira <b style="color:var(--gold)">XP, níveis acadêmicos e recompensas</b>.</p>
+    </div>
+    <div id="acad-wrap"></div>
+  </section>
+
+  <!-- ============ DESBLOQUEIE A INTIMIDADE ============ -->
+  <section id="screen-desbloqueio" class="screen">
+    <div class="game-head">
+      <button class="back-btn" data-back>← Início</button>
+      <h2>🔓 Desbloqueie a Intimidade</h2>
+      <p class="sub">Uma jornada em 6 fases com selos e níveis de conhecimento. Cada fase ensina algo novo e libera <b style="color:var(--gold)">conteúdos, técnicas e desafios</b>.</p>
+    </div>
+    <div id="unl-wrap"></div>
+  </section>
+</main>
+
+<!-- ============ MODAL & TOASTS ============ -->
+<div id="modal" class="modal hidden">
+  <div class="modal-back"></div>
+  <div class="modal-box" id="modal-box"></div>
+</div>
+<div id="toasts"></div>
+<script>
+/* ============================================================
+   ENTRE NÓS — conteúdo dos jogos
+============================================================ */
+
+const TYPE_META = {
+  verdade:  { n:"Verdade",        ic:"💭", cls:"t-v" },
+  escolha:  { n:"Escolha Dilema", ic:"⚖️", cls:"t-e" },
+  missao:   { n:"Missão",         ic:"🎯", cls:"t-m" },
+  previsao: { n:"Previsão",       ic:"🔮", cls:"t-p" }
+};
+
+const DESEJOS = {
+  fagulha: {
+    name:"Fagulha", icon:"🌙", sub:"Leve, divertida — a faísca que começa a noite.",
+    cards:[
+      { t:"previsao", x:"Qual foi a primeira coisa que você pensou quando me viu pela primeira vez?" },
+      { t:"escolha", x:"Se fosse possível escolher agora: um jantar à luz de velas em Paris ou café na cama todos os dias por um mês?" },
+      { t:"missao", x:"Sussurre três palavras no ouvido do seu par.", s:"Apenas três. O resto é por conta da imaginação dele(a)." },
+      { t:"verdade", x:"Qual música descreve o que você sente agora?", s:"Não diga o nome — descreva apenas a emoção." },
+      { t:"previsao", x:"Se eu fosse um clima, qual seria: tempestade, brisa leve ou verão eterno?" },
+      { t:"missao", x:"Escolha um ponto das mãos do seu par — palma, dedo ou punho — e beije exatamente ali.", s:"Ele(a) deve adivinhar qual foi. Errou, beija de novo." },
+      { t:"escolha", x:"Você prefere um beijo inesperado ou um elogio inesperado? Defenda seu argumento em 20 segundos." },
+      { t:"verdade", x:"O que é mais difícil para você: pedir um abraço ou pedir desculpas?" },
+      { t:"missao", x:"Dançem uma música inteira de frente, sem soltar as mãos e sem falar nada.", s:"Quem falar primeiro, perde a próxima rodada de escolha." },
+      { t:"previsao", x:"Qual som do meu dia a dia te acalma: minha risada, minha voz sonolenta ou meus passos pela casa?" },
+      { t:"escolha", x:"Impossível escolher, mas: meus beijos ou meus abraços? Um entra em extinção — qual você salva?" },
+      { t:"verdade", x:"Se a nossa história fosse um livro, qual seria o título deste capítulo?" }
+    ]
+  },
+  chama: {
+    name:"Chama", icon:"🔥", sub:"A temperatura sobe — e a mente também.",
+    cards:[
+      { t:"verdade", x:"O que você imaginou sobre nós dois antes de acontecer de verdade?" },
+      { t:"escolha", x:"Uma noite inteira só de beijos sem falar nada, ou uma noite inteira de conversa sobre todos os seus desejos — sem beijar?" },
+      { t:"missao", x:"Com os olhos do seu par fechados, guie a mão dele(a) até três lugares onde você gosta de ser tocado(a).", s:"Sem falar uma única palavra." },
+      { t:"previsao", x:"Onde você acha que eu mais gosto de ser beijado(a) — e que você nunca adivinharia fácil?" },
+      { t:"verdade", x:"Qual foi o momento em que você mais sentiu vontade de me beijar e não fez?" },
+      { t:"missao", x:"Complete em voz alta: 'Eu me pego pensando em você quando...'", s:"Com algo que ainda nunca contou." },
+      { t:"escolha", x:"Se eu dissesse 'me faça sentir especial agora', o que você faria: três palavras, um toque ou um olhar de 10 segundos?", s:"Você só pode usar um." },
+      { t:"previsao", x:"Qual parte do meu corpo eu mais amo receber elogios?" },
+      { t:"verdade", x:"O que você sente quando me vê sorrir sem saber que estava sendo observado(a)?" },
+      { t:"missao", x:"Descreva em voz alta, com riqueza de detalhes, o beijo que você gostaria de dar agora.", s:"O par ouve de olhos fechados." },
+      { t:"escolha", x:"Reiniciar nossa primeira semana juntos sabendo o que sabe hoje, ou pular 10 anos e espiar o final?" },
+      { t:"previsao", x:"Se eu pudesse fugir hoje para praia, serra ou cidade — qual eu escolheria? E com quem eu iria?" }
+    ]
+  },
+  brasa: {
+    name:"Brasa", icon:"💜", sub:"Profundidade, vulnerabilidade e verdades raras.",
+    cards:[
+      { t:"verdade", x:"O que te deixa mais vulnerável em se entregar a alguém? E o que faz valer a pena mesmo assim?" },
+      { t:"escolha", x:"Contar um segredo que nunca contou a ninguém, ou reviver uma lembrança que nunca viveu?", s:"Compartilhe apenas o que estiver pronto." },
+      { t:"missao", x:"Cada um escreve um desejo seu em um papel e troca.", s:"Guardem — e cumprem o do outro em até 30 dias. Palavra é palavra." },
+      { t:"previsao", x:"Qual atmosfera me deixa mais à vontade: luz baixa com música, banho quente antes, ou conversa longa à mesa?" },
+      { t:"verdade", x:"O que o seu corpo pede com mais frequência — e o que ele raramente recebe?" },
+      { t:"missao", x:"Massageie o que o seu par escolher por 3 minutos: ombros, pés ou couro cabeludo.", s:"Em silêncio total. Só o toque." },
+      { t:"escolha", x:"Se pudéssemos desaparecer amanhã: cabana na neve a dois ou ilha deserta a dois?", s:"O que faria primeiro em cada uma?" },
+      { t:"previsao", x:"Qual das minhas qualidades você acha que eu subestimo em mim?" },
+      { t:"verdade", x:"Quando se olha no espelho, o que gostaria de ver com outros olhos?", s:"Agora troque: diga o que vê de mais bonito no seu par." },
+      { t:"missao", x:"Contemplem-se em silêncio por 60 segundos — rosto, olhos, tudo.", s:"Depois, cada um diz uma verdade que os olhos revelaram." },
+      { t:"escolha", x:"Sabendo que ninguém vai ler: o que você pediria para mim hoje, se tivesse certeza absoluta de um sim?" },
+      { t:"previsao", x:"O que você acha que eu sonho para nós daqui a 5 anos? Chute o mais próximo que puder." }
+    ]
+  },
+  ouro: {
+    name:"Cofre Dourado", icon:"🗝️", sub:"A recompensa para mentes afiadas.",
+    cards:[
+      { t:"missao", x:"Cada um escreve três palavras que definem o que sente agora e troca o papel.", s:"Juntos, criem uma única frase usando as seis palavras." },
+      { t:"verdade", x:"Qual versão de nós dois você quer viver mais: a que ri até chorar, a que desafia o mundo ou a que descansa no silêncio?" },
+      { t:"missao", x:"Escolham uma música 'de vocês' e ouçam os próximos 3 minutos de olhos fechados.", s:"Sem tocar um no outro. Só sentir a presença." },
+      { t:"previsao", x:"Qual memória nossa você acha que eu revivo mais vezes?" },
+      { t:"escolha", x:"Se esta noite pudesse terminar de três formas — com uma risada, com uma promessa ou com um beijo — qual você escolheria?", s:"E o que faria para que acontecesse?" },
+      { t:"verdade", x:"O que significa, para você, 'chegar em casa'? Uma pessoa, um lugar ou um sentimento?" }
+    ]
+  }
+};
+
+const RIDDLES = [
+  { q:"Tenho cidades sem casas, florestas sem árvores e rios sem água. O que sou eu?", a:["mapa","map"] },
+  { q:"Quanto mais você tira de mim, maior eu fico. O que sou eu?", a:["buraco","furo"] },
+  { q:"Quebro o silêncio sem falar, derreto o frio sem fogo e, quando sou acesa por dois, ilumino o que ninguém vê. O que sou eu?", a:["vela","chama"] },
+  { q:"Estou sempre à sua frente, mas invisível; todos me alcançam, ninguém me segura. O que sou eu?", a:["futuro","amanha","amanhã"] },
+  { q:"Não se toca, não se vê, mas quando existe entre dois, tudo se sente. Nasce do olhar e cresce do toque. O que é?", a:["sintonia","conexao","conexão","amor"] }
+];
+
+/* ============ CINCO SENTIDOS ============ */
+const SENSES = [
+  { id:"visao", name:"Visão", icon:"👁️", missions:[
+    { t:"Cena Congelada", pts:4,
+      d:"Sua memória visual guarda mais do que você imagina — vamos testá-la ao vivo.",
+      steps:["Observe atentamente tudo ao redor por <b>30 segundos</b>.","Feche os olhos: o seu par faz <b>3 perguntas</b> sobre a cena (ex.: quantos objetos azuis? o que está atrás de você?).","O par confere olhando. Depois troquem os papéis."],
+      timer:30,
+      sync:"Sem olhar: qual objeto desta sala tem a cor favorita do seu par? Diga ao mesmo tempo!" },
+    { t:"Detalhes Roubados", pts:5, mg:"emoji",
+      d:"Uma cena de emojis vai aparecer por 8 segundos. Guarde cada posição.",
+      steps:["Memorize a cena de emojis em <b>8 segundos</b>.","Responda <b>3 perguntas</b> sobre o que estava em cada posição.","Bônus humano: encarem-se por 30s e cada um revela um detalhe do rosto do outro que nunca tinha notado."],
+      sync:"O detalhe do rosto que você citou — digam os dois ao mesmo tempo. O olhar de vocês se encontrou?" },
+    { t:"Espelho do Olhar", pts:4, timer:60,
+      d:"Um minuto sem falar. Só olhos.",
+      steps:["Encarem-se em silêncio por <b>1 minuto</b> (piscar é permitido, rir não!).","Quem desviar o olhar primeiro, paga uma verdade na sequência.","Cada um conta o que percebeu de novo nos olhos do outro."],
+      sync:"Uma palavra para descrever o olhar do outro. Diga ao mesmo tempo — se igualar, é sinal demais." }
+  ]},
+  { id:"audicao", name:"Audição", icon:"🎧", missions:[
+    { t:"Eco do Ritmo", pts:5, mg:"simon",
+      d:"Ouça a sequência de tons e cores e repita. A cada acerto, ela cresce.",
+      steps:["Toque em <b>Ouvir sequência</b> e observe os 4 pads.","Repita na mesma ordem — tons e cores.","Chegue ao <b>nível 5</b> para dominar a missão."],
+      sync:"Qual é 'a música de vocês'? Digam ao mesmo tempo — se for a mesma, toquem em seguida." },
+    { t:"Sussurro Preciso", pts:4,
+      d:"Um orelhão, uma frase, zero repetições.",
+      steps:["Um coloca música baixa ou o ventilador ligado.","O outro sussurra uma frase de <b>5 palavras</b> no ouvido dele.","Repita sem errar. Errou? Cumpre uma mini-missão do par: imitar uma risada."],
+      sync:"Qual som do dia a dia de vocês dois é o mais reconfortante? Diga ao mesmo tempo." },
+    { t:"Trilha dos Sons", pts:4,
+      d:"Três sons, três adivinhações, zero olhos.",
+      steps:["Um fecha os olhos.","O outro faz <b>3 sons diferentes</b> com o que tiver por perto (estalar dedos, amassar papel, bater na mesa...).","Adivinhe os três de primeira. Cada erro, o som vira 'ringtone' do seu celular por 1 minuto."],
+      sync:"Qual voz famosa narraria a vida do seu par? Digam ao mesmo tempo." }
+  ]},
+  { id:"tato", name:"Tato", icon:"✋", missions:[
+    { t:"Alfabeto da Pele", pts:4,
+      d:"Escrever sem tinta, ler sem olhos.",
+      steps:["Um vira de costas (ou fecha os olhos).","O outro escreve uma <b>palavra</b> com o dedo nas costas dele.","Adivinhe a palavra. Duas rodadas para cada um."],
+      sync:"Se a pele do seu par fosse um tecido, qual seria? Digam ao mesmo tempo." },
+    { t:"Textura Anônima", pts:5,
+      d:"Três objetos, olhos vendados, uma decisão.",
+      steps:["Separem <b>3 objetos</b> com texturas bem diferentes.","De olhos fechados, toque um por vez por <b>10 segundos</b>.","Diga: áspero, macio ou liso — e tente adivinhar o objeto."],
+      sync:"Qual textura acalma o seu par na hora do estresse? Digam ao mesmo tempo." },
+    { t:"Mapa de Calor", pts:5,
+      d:"Cinco toques, uma memória infalível (ou não).",
+      steps:["Um fecha os olhos.","O outro toca <b>5 pontos</b> do braço e da mão dele, na ordem, com a ponta dos dedos.","Ele aponta os 5 lugares, na mesma ordem, sem espiar."],
+      sync:"Mão ou braço: qual toque o seu par prefere receber? Digam ao mesmo tempo." }
+  ]},
+  { id:"olfato", name:"Olfato", icon:"🌹", missions:[
+    { t:"Perfume de Memória", pts:4,
+      d:"Cheiro é o sentido com linha direta para a memória.",
+      steps:["Cada um escolhe um cheiro da casa (café, sabonete, erva...).","De olhos fechados, o outro sente e <b>adivinha</b> o que é.","Depois conta qual <b>memória</b> aquele cheiro trouxe."],
+      sync:"Qual cheiro lembra a infância do seu par? Digam ao mesmo tempo." },
+    { t:"Trilogia do Aroma", pts:5,
+      d:"Três cheiros em sequência. Uma memória de aço.",
+      steps:["Escolham 3 cheiros e numerem de 1 a 3.","De olhos fechados, sinta os <b>3 em sequência</b>.","Adivinhe os três — no fim, confira o nome e a ordem."],
+      sync:"Qual cheiro vocês associam ao primeiro encontro? Digam ao mesmo tempo." },
+    { t:"Cheiro de Nós", pts:4,
+      d:"O perfume favorito que ninguém nunca descreveu em voz alta.",
+      steps:["Cada um descreve, sem mostrar, o cheiro favorito <b>do outro</b> (perfume, cabelo, pele...).","O outro tenta adivinhar o que foi descrito.","Quem acertar escolhe o próximo nível."],
+      sync:"Qual cheiro 'é a cara' do seu par? Digam ao mesmo tempo." }
+  ]},
+  { id:"paladar", name:"Paladar", icon:"🍫", missions:[
+    { t:"Três Sabores", pts:4,
+      d:"Um teste cego de cozinha.",
+      steps:["Preparem 3 pedacinhos de comida com sabores bem diferentes.","De olhos fechados, prove um por vez.","Identifique <b>textura + sabor</b>. Depois troquem os papéis."],
+      sync:"Qual é o sabor favorito do seu par: doce, salgado ou azedo? Digam ao mesmo tempo." },
+    { t:"Doce ou Engano", pts:5,
+      d:"A experiência que prova: sabor é metade ilusão.",
+      steps:["Separem algo doce e algo salgado.","De olhos fechados <b>e nariz apertado</b>, prove os dois.","Diga qual é qual. Sem o nariz, a língua quase fica cega — e você vai entender por quê."],
+      sync:"Se o seu par fosse um sabor, qual seria? Digam ao mesmo tempo." },
+    { t:"Receita Secreta", pts:4,
+      d:"Três palavras. Um prato. Uma adivinhação.",
+      steps:["Um descreve em <b>3 palavras</b> o prato que faria para o outro hoje.","O outro adivinha o prato completo.","Depois trocam os papéis."],
+      sync:"Qual prato o seu par faria para você em uma noite especial? Digam ao mesmo tempo." }
+  ]}
+];
+
+/* ============ MOVIMENTO: EXERCÍCIOS ============ */
+const EXERCISES = [
+  { id:"alonga", icon:"🧘", name:"Alongamento das Costas a Dois", meta:"3 min · flexibilidade",
+    obj:"Alongar toda a cadeia posterior das costas com ajuda do par.",
+    passos:["Sente-se de frente, pernas cruzadas, a um braço de distância.","Segurem as mãos com os braços quase esticados.","Um puxa suavemente enquanto o outro deixa o tronco cair para trás, alongando as costas.","Respirem fundo 3 vezes e troquem os papéis."],
+    tec:"Mantenha os braços quase esticados (ângulo de ~120°) e o tronco alinhado — alongue até sentir tensão leve, nunca dor.",
+    adapt:["Corpos mais rígidos: flexione levemente os cotovelos e reduza a inclinação.","Sensibilidade nos ombros: usem uma toalha entre vocês em vez de segurar as mãos direto."],
+    pts:4,
+    svg:`<svg viewBox="0 0 220 150"><line x1="18" y1="128" x2="202" y2="128" class="g-line"/><circle cx="62" cy="52" r="11" class="s-lav"/><path d="M62 63 L58 96" class="s-lav"/><path d="M58 96 L36 120 M58 96 L78 116 M36 120 L46 110 M78 116 L68 106" class="s-lav"/><path d="M60 70 L102 63" class="s-lav"/><circle cx="158" cy="44" r="11" class="s-rose"/><path d="M158 55 L166 92" class="s-rose"/><path d="M166 92 L188 116 M166 92 L146 114" class="s-rose"/><path d="M156 63 L106 63" class="s-rose"/><circle cx="104" cy="63" r="5" class="s-gold"/><path d="M114 52 Q126 40 140 40" class="arr"/><path d="M94 82 A24 24 0 0 1 116 90" class="ang"/><text x="96" y="110" class="svgt">120°</text></svg>` },
+  { id:"equilibrio", icon:"🤸", name:"Equilíbrio do Casal", meta:"2-5 min · equilíbrio",
+    obj:"Testar quem fica mais tempo em um pé só — e bater o recorde de vocês.",
+    passos:["Fiquem frente a frente, a um braço de distância.","Segurem as mãos e cada um levanta um pé (o lado é livre).","Quem aguentar mais tempo vence a rodada.","Zerem e tentem bater o recorde do cronômetro."],
+    tec:"Olhar fixo em um ponto à frente estabiliza o corpo: a visão responde por até 30% do controle postural.",
+    adapt:["Para iniciantes: comece com os dois pés no chão e apenas feche os olhos por 10s.","Dor no tornozelo: apoie o pé levantado na panturrilha em vez de sobre o joelho."],
+    pts:4, stopwatch:true,
+    svg:`<svg viewBox="0 0 220 150"><line x1="18" y1="128" x2="202" y2="128" class="g-line"/><circle cx="66" cy="34" r="10" class="s-lav"/><path d="M66 44 L64 78" class="s-lav"/><path d="M64 78 L56 104 M64 78 L74 104" class="s-lav"/><path d="M64 78 L52 78 M52 78 L52 104" class="s-lav"/><path d="M65 52 L102 62" class="s-lav"/><circle cx="154" cy="34" r="10" class="s-rose"/><path d="M154 44 L156 78" class="s-rose"/><path d="M156 78 L164 104 M156 78 L146 104" class="s-rose"/><path d="M156 78 L168 78 M168 78 L168 104" class="s-rose"/><path d="M155 52 L118 62" class="s-rose"/><circle cx="110" cy="62" r="5" class="s-gold"/><path d="M40 96 A16 16 0 0 1 50 76" class="ang"/><text x="26" y="90" class="svgt">90°</text><path d="M180 96 A16 16 0 0 0 170 76" class="ang"/><text x="180" y="90" class="svgt">90°</text></svg>` },
+  { id:"espelho", icon:"🪞", name:"Espelho Humano", meta:"3-6 min · coordenação",
+    obj:"Sincronizar movimento em tempo real, como um reflexo.",
+    passos:["Um se move devagar: braços, cabeça e tronco.","O outro é o espelho: copia tudo em tempo real.","A cada 30s, troquem os papéis sem avisar.","Não vale falar — só observar e reagir."],
+    tec:"Movimente-se devagar e em planos simples: a sintonia motora melhora quando o ritmo é previsível.",
+    adapt:["Mobilidade reduzida: usem apenas braços e cabeça, sentados."],
+    pts:4,
+    svg:`<svg viewBox="0 0 220 150"><line x1="110" y1="18" x2="110" y2="132" class="ang" stroke-dasharray="4 8"/><circle cx="66" cy="50" r="11" class="s-lav"/><path d="M66 61 L64 100" class="s-lav"/><path d="M64 100 L54 124 M64 100 L76 124" class="s-lav"/><path d="M65 68 L86 40" class="s-lav"/><circle cx="154" cy="50" r="11" class="s-rose"/><path d="M154 61 L156 100" class="s-rose"/><path d="M156 100 L166 124 M156 100 L144 124" class="s-rose"/><path d="M155 68 L134 40" class="s-rose"/><path d="M78 34 Q88 24 96 28" class="arr"/><path d="M142 34 Q132 24 124 28" class="arr"/></svg>` },
+  { id:"guia", icon:"🌙", name:"Guia Cego", meta:"5 min · confiança",
+    obj:"Comunicar com precisão e construir confiança — só com a voz.",
+    passos:["Um fecha os olhos (ou vira de costas).","O outro guia pela casa apenas com a voz: 'dois passos à frente', 'vire à direita'.","Chegue a um lugar escolhido em seguida pelo guia.","Troquem os papéis."],
+    tec:"Comandos curtos e claros reduzem o tempo de reação: comunicação precisa é a base da sintonia — dentro e fora do jogo.",
+    adapt:["Casa pequena: guiem apenas entre dois cômodos, nunca perto de escadas."],
+    pts:4,
+    svg:`<svg viewBox="0 0 220 150"><circle cx="70" cy="52" r="12" class="s-lav"/><path d="M70 64 L70 102" class="s-lav"/><path d="M70 102 L60 126 M70 102 L82 126" class="s-lav"/><path d="M58 50 L82 50" class="s-gold" stroke-width="4"/><path d="M62 58 L66 56 M74 56 L78 58" class="g-line"/><circle cx="160" cy="46" r="11" class="s-mint"/><path d="M160 57 L160 100" class="s-mint"/><path d="M160 100 L150 124 M160 100 L172 124" class="s-mint"/><path d="M146 40 Q138 52 146 64 M138 32 Q126 52 138 72" class="arr"/><path d="M92 122 L104 122 M108 122 L120 122" class="arr"/></svg>` },
+  { id:"cadeira", icon:"🪑", name:"Cadeira Dupla", meta:"2-4 min · força",
+    obj:"Sentar no ar, de costas um para o outro — pura cooperação.",
+    passos:["Fiquem de costas um para o outro, braços entrelaçados pelos cotovelos.","Descam as costas uma na outra e flexionem os joelhos até formar dois 'assentos'.","Segurem 15 segundos e subam juntos.","Repitam 3 vezes."],
+    tec:"Joelhos em 90° e pés afastados na largura do quadril — o peso deve ficar nos calcanhares, não nos joelhos.",
+    adapt:["Dor no joelho: desçam apenas até 45° e segurem menos tempo.","Diferença de altura: quem for mais alto flexiona um pouco mais os joelhos."],
+    pts:5,
+    svg:`<svg viewBox="0 0 220 150"><line x1="18" y1="128" x2="202" y2="128" class="g-line"/><path d="M96 122 L102 68" class="s-lav"/><circle cx="103" cy="56" r="10" class="s-lav"/><path d="M96 122 L60 122 M60 122 L60 128" class="s-lav"/><path d="M124 122 L118 68" class="s-rose"/><circle cx="117" cy="56" r="10" class="s-rose"/><path d="M124 122 L160 122 M160 122 L160 128" class="s-rose"/><path d="M96 84 L124 84" class="s-gold" stroke-width="4"/><path d="M60 108 A14 14 0 0 1 74 122" class="ang"/><text x="46" y="102" class="svgt">90°</text><path d="M160 108 A14 14 0 0 0 146 122" class="ang"/><text x="164" y="102" class="svgt">90°</text></svg>` },
+  { id:"respira", icon:"🌬️", name:"Respiração 4-4-6", meta:"2 min · calma",
+    obj:"Sincronizar a respiração para acalmar o corpo a dois.",
+    passos:["Sente-se de frente, ou um deitado com a cabeça no colo do outro.","Inspire pelo nariz contando até 4.","Segure por 4.","Solte pela boca, devagar, contando até 6. Repitam por 2 minutos."],
+    tec:"A expiração longa ativa o sistema parassimpático: o coração desacelera e a tensão cai. Sincronizar com o par amplia o efeito.",
+    adapt:["Congestão nasal: inspire pela boca semicerrada.","Iniciantes: comece com 3-3-5 e aumente aos poucos."],
+    pts:4, timer:120,
+    svg:`<svg viewBox="0 0 220 150"><circle cx="110" cy="72" r="52" class="ang"/><circle cx="110" cy="52" r="11" class="s-lav"/><path d="M110 63 L110 96" class="s-lav"/><path d="M110 96 L92 112 M110 96 L128 112 M92 112 L98 100 M128 112 L122 100" class="s-lav"/><path d="M40 66 L52 66 Q62 66 62 72 Q62 78 72 78 L84 78" class="s-mint"/><path d="M136 78 L148 78 Q158 78 158 72 Q158 66 168 66 L180 66" class="s-gold"/><text x="34" y="58" class="svgt">4</text><text x="176" y="58" class="svgt">6</text></svg>` },
+  { id:"danca", icon:"💃", name:"Dança Lenta de Olhos Fechados", meta:"1 música · sintonia",
+    obj:"Sentir o movimento do outro sem a visão — leitura corporal pura.",
+    passos:["Escolham uma música calma.","Abraçados ou de mãos dadas, fechem os olhos.","Dancem a música inteira sentindo o peso e o passo do outro.","Ao terminar, digam uma palavra sobre a experiência."],
+    tec:"Sem a visão, o ouvido interno e o tato assumem o comando do equilíbrio: vocês passam a 'ler' o movimento um do outro.",
+    adapt:["Problemas de equilíbrio: dancem sentados, balançando os troncos no ritmo."],
+    pts:4,
+    svg:`<svg viewBox="0 0 220 150"><circle cx="94" cy="50" r="11" class="s-lav"/><circle cx="128" cy="46" r="11" class="s-rose"/><path d="M88 48 L96 46 M126 44 L134 46" class="g-line"/><path d="M94 61 L96 98" class="s-lav"/><path d="M128 57 L124 98" class="s-rose"/><path d="M96 98 L86 124 M96 98 L108 124" class="s-lav"/><path d="M124 98 L134 124 M124 98 L112 124" class="s-rose"/><path d="M95 70 Q111 84 125 72" class="s-gold" stroke-width="4"/><path d="M78 36 Q82 28 88 30" class="arr"/><path d="M144 32 Q148 26 154 30" class="arr"/><text x="164" y="46" class="svgt" style="font-size:20px">♪</text></svg>` },
+  { id:"passo", icon:"👣", name:"Passo em Sincronia", meta:"3 min · ritmo",
+    obj:"Combina a cadência dos passos até vocês andarem como um só.",
+    passos:["Um anda um trajeto curto; o outro, de olhos fechados, combina o ritmo dos passos só ouvindo.","Agora tentem andar exatamente juntos, passo a passo, lado a lado, sem falar.","Contem os passos em voz alta: 1, 2, 3...","Aumentem a velocidade aos poucos."],
+    tec:"Cadência comum (passos por minuto) cria sintonia motora — é exatamente assim que dançarinos e remadores treinam juntos.",
+    adapt:["Mobilidade limitada: sincronizem palmas ou batidas na mesa no mesmo compasso."],
+    pts:4,
+    svg:`<svg viewBox="0 0 220 150"><ellipse cx="46" cy="104" rx="9" ry="14" class="s-gold" transform="rotate(-14 46 104)"/><ellipse cx="74" cy="92" rx="9" ry="14" class="s-rose" transform="rotate(10 74 92)"/><ellipse cx="102" cy="84" rx="9" ry="14" class="s-gold" transform="rotate(-10 102 84)"/><ellipse cx="130" cy="92" rx="9" ry="14" class="s-rose" transform="rotate(14 130 92)"/><ellipse cx="158" cy="100" rx="9" ry="14" class="s-gold" transform="rotate(-6 158 100)"/><path d="M46 76 Q102 44 158 76" class="arr"/><text x="98" y="38" class="svgt" style="font-size:18px">♪</text></svg>` }
+];
+
+/* ============ QUIZ DO CORPO ============ */
+const QUIZ = [
+  { q:"Qual sentido é o primeiro a se desenvolver no bebê, ainda no útero?", o:["Visão","Tato","Audição","Paladar"], c:1,
+    w:"O tato surge por volta da 8ª semana de gestação — antes da visão, que só amadurece meses depois do nascimento. Por isso o toque é a nossa primeira linguagem." },
+  { q:"Em pé e parado, até 30% do seu equilíbrio vem de...", o:["A audição","A visão","O olfato"], c:1,
+    w:"O sistema visual é um dos pilares do controle postural. É por isso que fechar os olhos dificulta o equilíbrio — e é por isso que o Espelho Humano funciona." },
+  { q:"Cruzar as pernas por longos períodos pode...", o:["Desalinhar o quadril e a coluna","Curar a tensão muscular","Melhorar a circulação"], c:0,
+    w:"O hábito mantém o quadril rotacionado por horas. O ideal é alternar a posição a cada 15-20 minutos." },
+  { q:"Soltar o ar devagar (expiração longa)...", o:["Ativa o relaxamento e reduz os batimentos","Aumenta a pressão arterial","Não muda nada no corpo"], c:0,
+    w:"Expirar lentamente ativa o sistema parassimpático — o 'modo descanso' do corpo. É a base do desafio Respiração 4-4-6." },
+  { q:"Sem o nariz, a língua distingue muito melhor doces de salgados.", o:["Verdade","Mito"], c:1,
+    w:"É o contrário: boa parte do 'sabor' é, na verdade, olfato. Tampe o nariz e o cérebro quase fica cego para os sabores — você testou isso na missão Doce ou Engano." },
+  { q:"Os pés concentram cerca de quantos por cento dos ossos do corpo humano?", o:["5%","15%","25%"], c:2,
+    w:"São 26 ossos em cada pé: 52 dos ~206 do corpo. Pequenos, mas carregam você a vida inteira — capriche na massagem." },
+  { q:"Onde fica o órgão que controla o equilíbrio?", o:["No ouvido interno","Na planta dos pés","Na coluna"], c:0,
+    w:"O sistema vestibular, dentro do ouvido, detecta o movimento e a posição da cabeça. Visão, tato e ouvido trabalham juntos para manter você de pé." },
+  { q:"Massagem e toque afetuoso comprovadamente...", o:["Reduzem o cortisol (hormônio do estresse)","Aumentam o cortisol","Servem apenas para músculos"], c:0,
+    w:"O toque gentil reduz o cortisol e libera oxitocina — o hormônio do vínculo. A ciência confirmando o que casais já sabiam." }
+];
+
+/* ============ ARTE DA SEDUÇÃO ============ */
+const SED_KIND_META={carta:{ic:'🃏',n:'Carta Surpresa'},situacao:{ic:'🎭',n:'Situação Interativa'},desafio:{ic:'🎯',n:'Desafio Leve'}};
+const SED_STAGES=[
+  {id:'c1',icon:'💬',name:'Comunicação',sub:'O jogo começa nas palavras.',momentos:[
+    {kind:'carta',t:'Carta Surpresa',x:'Elogie um detalhe do seu par que ninguém mais no mundo notaria.',s:'Quanto mais específico o elogio, mais forte o efeito.'},
+    {kind:'situacao',t:'Situação: o jantar com amigos',x:'No meio do jantar, o seu par sussurra baixinho: "quando a gente chegar em casa...". Você:',opts:[
+      {o:'Devolve um sussurro provocante e disfarça a risada',re:'Provocar e adiar cria antecipação — o desejo mora na espera. Vocês acabaram de criar um segredo público de dois, e segredos compartilhados são cola emocional.'},
+      {o:'Sussurra de volta um plano concreto para mais tarde',re:'Promessas claras também seduzem: intenção declarada mostra coragem. "Eu quero você às 22h" é uma frase que aquece a noite inteira.'}]},
+    {kind:'desafio',t:'Desafio do Sussurro',steps:['Um fecha os olhos.','O outro entrega 3 desejos simples para esta semana — em sussurros, um por vez.','Troquem os papéis sem comentar o que ouviram. Guardar segredo é parte do jogo.'],timer:90}
+  ]},
+  {id:'c2',icon:'🕯️',name:'Clima',sub:'Construir atmosfera é arte.',momentos:[
+    {kind:'carta',t:'Carta Surpresa',x:'Em 2 minutos, montem o "ritual de clima" de vocês: 1 música, 1 luz, 1 cheiro.',s:'Guardem a receita — ela vale para as próximas noites.'},
+    {kind:'situacao',t:'Situação: a noite perfeita (e o celular)',x:'A noite estava morna, mas o celular do seu par vibra a cada minuto. Você:',opts:[
+      {o:'Pega o celular, silencia com um sorriso e devolve um olhar',re:'Gestos decididos criam clima — e funcionam quando o par ri junto. O consentimento rege: humor bom, atitude boa.'},
+      {o:'Propõe um trato: uma hora sem telas para os dois',re:'Pactos explícitos são sedução madura. Combinar regras a dois é intimidade em alta definição — e vale para qualquer jogo desta coleção.'}]},
+    {kind:'desafio',t:'Sala de Massagem',steps:['O recebedor escolhe a música.','Massagem de ombros, pescoço e couro cabeludo por 5 minutos.','Depois troquem os papéis — sem pressa e sem conversa.'],timer:300}
+  ]},
+  {id:'c3',icon:'🔥',name:'Desejos',sub:'O que pulsa abaixo da superfície.',momentos:[
+    {kind:'carta',t:'Carta Surpresa',x:'Cada um escreve em um papel algo que sonha experimentar "um dia". Troquem — sem ler em voz alta ainda.',s:'Ler os papéis é uma decisão de casal. Sem pressa.'},
+    {kind:'situacao',t:'Situação: a confissão inesperada',x:'O seu par confessa um desejo que te pegou totalmente de surpresa. Sua primeira reação:',opts:[
+      {o:'Curiosidade genuína: pede detalhes, sem compromisso nenhum',re:'Curiosidade sem julgamento mantém o confessionário aberto para sempre. Você não precisa dizer "sim" — precisa dizer "obrigado por confiar".'},
+      {o:'Honestidade: "preciso digerir isso, mas aceito meu obrigado(a)"',re:'Digerir em voz alta é intimidade real. Um "ainda não" verdadeiro vale mais que um "sim" falso — e protege a confiança que sustenta tudo.'}]},
+    {kind:'desafio',t:'Missão Espelho',steps:['Cada um pensa: o que o desejo do outro diz sobre ele(a)?','Em 1 minuto, descreva o que mais admira na coragem de se abrir.','Terminem com um beijo no topo da cabeça.'],timer:60}
+  ]},
+  {id:'c4',icon:'🛡️',name:'Limites',sub:'Onde o respeito acende a confiança.',momentos:[
+    {kind:'carta',t:'Carta Surpresa',x:'Em voz alta: cada um define 1 "sempre" e 1 "nunca" para hoje.',s:'Limites bem ditos são convites mais seguros.'},
+    {kind:'situacao',t:'Situação: a pausa no meio do caminho',x:'No meio de um momento muito bom, o seu par pede uma pausa. Você:',opts:[
+      {o:'Para na hora e transforma a pausa em carinho leve',re:'Pausa respeitada sem questionamento vale mais que dez beijos: segurança é o maior afrodisíaco de longo prazo.'},
+      {o:'Pergunta, com abertura real, se foi algo que você fez',re:'Checar sem pressionar mostra maturidade — desde que sem interrogatório. O corpo dele(a) mandou um recado; acolha o recado.'}]},
+    {kind:'desafio',t:'Contrato dos Dois',steps:['Criem 1 palavra-código para "continua" e 1 para "para agora".','Testem as duas em um abraço — cada um usa uma vez.','Rindam no fim: contratos de casal podem ser divertidos.']}
+  ]},
+  {id:'c5',icon:'🌌',name:'Conexão',sub:'A etapa que amarra todas as outras.',momentos:[
+    {kind:'carta',t:'Carta Surpresa',x:'Contemplem-se em silêncio por 60 segundos. Depois, cada um fala a primeira palavra que veio.',s:'Sem explicar a palavra. Ela vale o que vale.'},
+    {kind:'situacao',t:'Situação: a pergunta que vale ouro',x:'Você pode receber agora a resposta sincera de uma pergunta sobre vocês dois. Qual escolhe:',opts:[
+      {o:'"O que você mais sonha para nós daqui a 5 anos?"',re:'Sonhos compartilhados criam direção — casais que desenham o futuro juntos têm mais motivos para se desejar no presente.'},
+      {o:'"O que você mais guarda em silêncio sobre mim?"',re:'Os silêncios do par são mapas de admiração guardada. Pedir a chave é um ato de coragem — e de confiança recíproca.'}]},
+    {kind:'desafio',t:'Ritual Final',steps:['Montem a "playlist da sedução": 5 músicas.','Cada um escolhe 2 — e os dois escolhem juntas a 5ª.','Escutem a 5ª agora, de olhos fechados, mãos dadas.'],timer:240}
+  ]}
+];
+
+/* ============ ROLETA DO PRAZER ============ */
+const ROLETA_SEGS=[
+  {id:'sentidos',n:'Sentidos',ic:'👁️',items:[
+    {s:'Fechem os olhos por 30 segundos. Ao abrir, cada um diz o primeiro detalhe que notou no outro.',c:'Trilha do toque: guie a mão do par apenas pelo rosto dele(a) por 1 minuto.'},
+    {s:'Digam ao mesmo tempo: qual cheiro vocês associam ao primeiro encontro?',c:'Escolham 3 cheiros da casa e façam um teste cego — de olhos fechados.'},
+    {s:'Uma música qualquer toca: dancem 30 segundos sem falar nada.',c:'Sussurre 3 palavras no ouvido do par — sem repetir nenhuma palavra que disseram hoje.'},
+    {s:'Recriem a primeira bebida ou café que tomaram juntos.',c:'Com os olhos do par fechados, sirva algo pequeno e deixe adivinhar o sabor.'}]},
+  {id:'carinho',n:'Carinho',ic:'🤗',items:[
+    {s:'Abraço de 20 segundos, com contagem em voz alta.',c:'Cada um escreve 3 coisas que ama no abraço do outro — e lê em voz alta.'},
+    {s:'Massagem de 2 minutos: ombros, mãos ou couro cabeludo — o recebedor escolhe.',c:'Troquem carinhos na mão do outro: palma, dedos e punho, 1 minuto cada.'},
+    {s:'Beijo de bom-dia... às 23h. Quem inventar a melhor justificativa, vence.',c:'Recriem o primeiro beijo de vocês — o mais fiel possível, no lugar e do jeito que foi.'},
+    {s:'Cada um entrega "o carinho favorito" do outro, sem avisar.',c:'De mãos dadas, façam carinho no cabelo do outro por 1 minuto em silêncio.'}]},
+  {id:'conexao',n:'Conexão',ic:'💜',items:[
+    {s:'Digam juntos, ao mesmo tempo: "o que mais me atraiu em você foi..."',c:'Encarem-se por 60 segundos. Quem rir primeiro, paga uma verdade.'},
+    {s:'Escolham uma foto aleatória do celular e contem a história dela.',c:'Montem a lista dos 5 próximos sonhos de vocês — um de cada, e 3 juntos.'},
+    {s:'Cada um diz 3 qualidades do outro que não são físicas.',c:'Escrevam uma carta curta "para daqui a 1 ano" e guardem no celular.'},
+    {s:'Qual seria o nome da série da vida de vocês? Digam ao mesmo tempo.',c:'Criem 3 regras divertidas para o próximo passeio de vocês.'}]},
+  {id:'comunicacao',n:'Comunicação',ic:'💬',items:[
+    {s:'Complete juntos: "eu me sinto amado(a) quando você..."',c:'Cada um revela 1 frase que quer ouvir com mais frequência — e o outro repete, olhando nos olhos.'},
+    {s:'Definam em 1 palavra como foi a semana de vocês.',c:'Digam 2 elogios sinceros e 1 pedido gentil para o próximo mês.'},
+    {s:'Qual pergunta você sempre quis fazer e nunca fez? Agora é a hora.',c:'Contem um "mal-entendido" engraçado que já viveram e como resolveriam hoje.'},
+    {s:'Digam ao mesmo tempo: qual apelido novo para o par?',c:'Cada um propõe 1 combinação que melhoraria a rotina de vocês.'}]},
+  {id:'desafios',n:'Desafios',ic:'🎯',items:[
+    {s:'Imitem a risada um do outro. Quem for mais fiel, vence.',c:'Dança de 1 música com uma regra: só uma mão pode ser usada.'},
+    {s:'Escolham: verdade ou desafio — e cumpram o que o par mandar.',c:'Karaokê mudo: cantem 30s de uma música sem som, com muita atitude.'},
+    {s:'Fiquem de pé e troquem 3 poses dramáticas de novela.',c:'Espelho humano: um se move, o outro copia — 45 segundos, sem rir (boa sorte).'},
+    {s:'Troquem de papel: cada um fala como acha que o outro descreveria o primeiro encontro.',c:'Rodada de verdades: 2 perguntas corajosas, respondidas sem defesa.'}]},
+  {id:'coroa',n:'Coroa Real',ic:'👑',items:[
+    {s:'👑 Coroa Real: o par escolhe QUALQUER desafio dos outros segmentos — e cumprir juntos.',c:'Além disso, esta rodada vale sintonia dupla.'},
+    {s:'👑 Coroa Real: cada um dá 3 ordens gentis que serão obedecidas sem protesto hoje.',c:'A terceira ordem deve ser algo doce para amanhã.'},
+    {s:'👑 Coroa Real: 10 minutos de "sim dos dois" — só acontece o que os dois quiserem.',c:'Inventem juntos 1 desafio novo e guardem para a próxima rodada.'},
+    {s:'👑 Coroa Real: o par ganha 1 "vale-tudo" para usar em qualquer jogo desta coleção.',c:'Escolham agora qual jogo vai receber o vale.'}]}
+];
+
+/* ============ ACADEMIA DA INTIMIDADE ============ */
+const LVL_NAMES=['Calouro(a)','Pesquisador(a)','Especialista','Doutor(a) do Prazer'];
+const LVL_ICONS=['🌱','🔬','🎖️','🎓'];
+const LVL_THRESH=[0,12,26,40];
+const ACADEMY=[
+  {id:'consentimento',icon:'🤝',name:'Consentimento',sub:'A base de tudo — e a parte mais atraente.',
+    curiosidade:'A palavra "consentir" vem do latim consentire: "sentir junto". Consentimento é literalmente sentir na mesma direção.',
+    qs:[
+      {q:'Um "sim" combinado antes pode ser retirado durante o momento?',o:['Não — o combinado vale','Sim, a qualquer momento e sem justificativa','Só se a pessoa avisar com antecedência'],c:1,
+       w:'Consentimento é um "sim" vivo: pode ser retirado a qualquer instante. Pausar nunca é ofensa — é comunicação de altíssimo nível.'},
+      {q:'Silêncio, imobilidade ou "está bom assim" significam consentimento?',o:['Sim, se houver confiança','Não — consentimento precisa ser claro e entusiasmado','Depende do tempo de relacionamento'],c:1,
+       w:'Sem um "sim" claro, não há consentimento. E vale nos dois sentidos: um "não" em qualquer momento deve ser acolhido na hora, sem interrogatório.'},
+      {q:'Qual combinação mantém o consentimento saudável num casal?',o:['Assumir que o par sempre quer','Conversar antes, durante e depois','Evitar o assunto para não "quebrar o clima"'],c:1,
+       w:'Falando antes, perguntando durante e agradecendo depois, o assunto passa a fazer parte do charme — casais que conversam sobre o que querem têm mais intimidade, não menos.'}]},
+  {id:'anatomia',icon:'💗',name:'Anatomia & Prazer',sub:'Conhecer o corpo é meio caminho.',
+    curiosidade:'O clitóris é o único órgão humano que existe exclusivamente para dar prazer — cerca de 8.000 fibras nervosas, o dobro do pênis.',
+    qs:[
+      {q:'Qual é o único órgão humano cuja função conhecida é exclusivamente dar prazer?',o:['O clitóris','O coração','A pele'],c:0,
+       w:'O clitóris tem cerca de 8.000 terminações nervosas e nenhuma outra função além do prazer. Conhecê-lo é fundamental para a satisfação a dois.'},
+      {q:'A maioria das pessoas com vulva atinge o orgasmo principalmente por:',o:['Penetração profunda','Estimulação do clitóris','Imaginação sem toque'],c:1,
+       w:'Estudos apontam a estimulação clitoriana como via principal para a maioria. A penetração pode ser ótima — mas raramente é o caminho sozinha.'},
+      {q:'Os pontos erógenos do corpo:',o:['São os mesmos em todas as pessoas','Variam de pessoa para pessoa — descobri-los faz parte','Existem apenas nos genitais'],c:1,
+       w:'Nuca, punho, atrás do joelho, orelhas... O mapa muda em cada corpo. Explorar com o par é a missão mais prazerosa da anatomia.'}]},
+  {id:'prevencao',icon:'🛡️',name:'Prevenção & Saúde',sub:'Cuidado também é sedução.',
+    curiosidade:'O preservativo é o único método que protege contra gestação e ISTs ao mesmo tempo — mais de 150 anos de serviço prestado à humanidade.',
+    qs:[
+      {q:'Qual método protege contra gestação E infecções sexualmente transmissíveis?',o:['Pílula anticoncepcional','Preservativo externo ou interno','Vacina contra HPV'],c:1,
+       w:'A pílula protege da gestação; a vacina, contra certos tipos de HPV. Só o preservativo cobre as duas frentes ao mesmo tempo.'},
+      {q:'Casais sexualmente ativos devem fazer check-ups de saúde sexual:',o:['Apenas quando aparecem sintomas','Uma vez na vida','Periodicamente, conforme orientação médica'],c:2,
+       w:'Muitas ISTs são silenciosas. Exames de rotina são um ato de cuidado com você e com o par — em qualquer fase da relação.'},
+      {q:'A vacina contra HPV:',o:['Não existe no Brasil','Está no calendário público de vacinação','Serve só para quem já teve o vírus'],c:1,
+       w:'O SUS oferece a vacina contra HPV em faixas etárias específicas — ela previne cânceres e verrugas genitais. Prevenção é um presente ao futuro.'}]},
+  {id:'lubrificacao',icon:'💧',name:'Lubrificação',sub:'O detalhe que muda tudo.',
+    curiosidade:'A lubrificação natural pode surgir em segundos com estímulo agradável — o corpo às vezes responde mais rápido que a mente.',
+    qs:[
+      {q:'O lubrificante à base de água é o mais recomendado porque:',o:['É o mais barato do mercado','É compatível com preservativos e com o corpo','Tem o melhor cheiro'],c:1,
+       w:'Lubrificantes de água não danificam o látex, não mancham e são bem tolerados pelo corpo. Óleos e vaselina ficam para ocasiões sem preservativo.'},
+      {q:'Vaselina e cremes corporais podem ser usados com preservativo de látex?',o:['Sim, sem problema','Não — produtos oleosos danificam o látex','Só em pequena quantidade'],c:1,
+       w:'Óleo enfraquece o látex e pode romper o preservativo sem aviso. Para o látex, água ou silicone — sempre.'},
+      {q:'Mais ou menos lubrificação natural ao longo do tempo indica:',o:['Falta de desejo, sempre','Um problema grave','Variação natural — estresse, ciclo e clima interferem; lubrificante ajuda sempre'],c:2,
+       w:'A lubrificação varia com hormônios, sono, estresse e até temperatura. Não é termômetro de desejo — e um bom lubrificante melhora qualquer momento.'}]},
+  {id:'resposta',icon:'✨',name:'Resposta Sexual',sub:'Como o corpo deseja e responde.',
+    curiosidade:'O abraço pós-carinho libera oxitocina — o mesmo hormônio presente na amamentação e nas boas memórias afetivas. Aproveite-o de olhos fechados.',
+    qs:[
+      {q:'O ciclo de resposta sexual (desejo → excitação → orgasmo):',o:['É idêntico para todas as pessoas','Varia de pessoa para pessoa e de noite para noite','Tem duração fixa e cronometrável'],c:1,
+       w:'Não existe um "relógio certo". Desejo pode chegar antes ou depois da excitação — e comparar-se a roteiros prontos só atrapalha.'},
+      {q:'Desejo e excitação física:',o:['São sempre a mesma coisa','Podem acontecer separadamente — e conversar alinha os dois','Nunca divergem em casais felizes'],c:1,
+       w:'O corpo pode responder sem desejo, e o desejo pode existir sem resposta corporal. Nenhuma das duas é "falta de amor" — é um convite à comunicação.'},
+      {q:'Após o momento íntimo, o corpo libera oxitocina e prolactina, que causam:',o:['Agitação e ansiedade','Calma, sono e sensação de vínculo','Nenhum efeito real'],c:1,
+       w:'É o famoso "afterglow": hormônios que relaxam e aproximam. Abraçar depois não é só carinho — é aproveitar a química que o corpo acabou de servir.'}]},
+  {id:'mitos',icon:'🔍',name:'Mitos & Verdades',sub:'A mente sabe — vamos provar.',
+    curiosidade:'Terapeutas repetem a frase: a maior parte do prazer acontece entre as orelhas. Cérebros bem conectados fazem corpos bem conectados.',
+    qs:[
+      {q:'"Não engravidar na primeira vez" é:',o:['Verdade','Mito — pode acontecer em qualquer encontro sem proteção','Depende da fase do ciclo'],c:1,
+       w:'Mito. Desde o primeiro encontro, sem proteção, a gestação é possível — e as ISTs também. Proteção não é opção, é básico.'},
+      {q:'Num relacionamento estável, saúde sexual deixa de importar:',o:['Mito — testes e acordos abertos continuam valendo','Verdade','Depende da idade do casal'],c:0,
+       w:'Confiança não substitui exames. Muitos casais fazem testes juntos por segurança e tranquilidade — check-up de vez em quando é cuidado puro.'},
+      {q:'O maior órgão sexual do ser humano é:',o:['A pele','O cérebro','O coração'],c:1,
+       w:'O cérebro comanda desejo, fantasia e prazer — a parte mais importante acontece entre as orelhas. Por isso imaginação e conversa são ferramentas de sedução.'}]}
+];
+
+/* ============ DESBLOQUEIE A INTIMIDADE ============ */
+const UNLOCK=[
+  {id:'f1',icon:'🔑',name:'Fundamentos',selo:'Fundador(a)',
+   li:'A regra número 1 da intimidade: cada "sim" é renovado a cada momento, e cada "não" é informação valiosa — nunca rejeição. Pausa não quebra o clima: quebra a pressa.',
+   rec:'Lição de base + o direito de criar as primeiras regras de vocês.',
+   passos:['Conversem por 3 minutos: cada um nomeia 3 coisas que ama na intimidade de vocês.','Cada um nomeia 1 coisa que prefere evitar hoje.','Acordem: "qualquer um pode pedir pausa, a qualquer hora."'],timer:180},
+  {id:'f2',icon:'💬',name:'Palavra',selo:'Bom(boa) de Voz',
+   li:'Frases-mágicas existem: "eu gosto quando...", "me leva mais longe quando...", "devagar aqui". Dizer o que funciona no momento certo é o superpoder dos casais sintonizados.',
+   rec:'Técnica das frases-mágicas desbloqueada.',
+   passos:['Cada um cria 2 frases-mágicas próprias.','Testem uma das frases na hora — em um abraço ou carinho.','Guardem as 4 frases no celular: são o dicionário de vocês.']},
+  {id:'f3',icon:'✋',name:'Toque',selo:'Cartógrafo(a) da Pele',
+   li:'A pele é o maior órgão do corpo e fala sem palavras. Nuca, punho, atrás do joelho, base da orelha: os lugares esquecidos guardam as reações mais sinceras.',
+   rec:'Mapa de toque dos lugares esquecidos desbloqueado.',
+   passos:['Tour de toque de 6 minutos: nuca, punhos, atrás dos joelhos e orelhas — 30s cada ponto.','Proibido tocar nos lugares "óbvios": a regra é descobrir o novo.','O recebedor guia só com "devagar", "mais forte" e "aqui".'],timer:360},
+  {id:'f4',icon:'⏳',name:'Ritmo',selo:'Mestre do Timing',
+   li:'A técnica start-stop é das mais simples e poderosas: intensidade sobe, congela, recomeça. A antecipação amplifica tudo — o cérebro adora o "quase".',
+   rec:'Técnica start-stop desbloqueada.',
+   passos:['3 rodadas de 1 minuto: aceleram, congelam no "quase", recomeçam.','Rir é permitido — a leveza é parte da técnica.','No fim, digam qual rodada teve a maior tensão.'],timer:180},
+  {id:'f5',icon:'🌊',name:'Profundidade',selo:'Guardião(ã) de Segredos',
+   li:'Vulnerabilidade é o último nível de confiança. Comece pelo baixo risco: segredos leves, agradecimentos sem julgamento. O que é acolhido uma vez, volta maior.',
+   rec:'Ritual dos segredos desbloqueado.',
+   passos:['Cada um revela 1 segredo leve que nunca contou.','O outro agradece, sem comentar e sem julgar.','Cada um soma 1 desejo para o futuro de vocês dois.']},
+  {id:'f6',icon:'🌌',name:'União',selo:'Alma Gêmea em Treinamento',
+   li:'Intimidade não é destino — é prática. Casais que têm "rituais próprios" (música, palavra-código, data mensal) relatam mais conexão e mais desejo no longo prazo.',
+   rec:'Ritual oficial de vocês + convite para a próxima jornada.',
+   passos:['Criem o ritual de vocês: 1 música, 1 palavra-código, 1 data mensal.','Salvem a data no celular agora — a próxima "noite entre nós".','Guardem o selo final: a jornada se completa, o jogo continua.']}
+];
+
+/* ============ CONQUISTAS ============ */
+const ACHIEVEMENTS = [
+  { id:"spark",     icon:"✨", name:"Primeira Faísca",        desc:"Jogue a primeira carta nos Desejos Secretos.",            check:s=>s.djCounts.fagulha+s.djCounts.chama+s.djCounts.brasa+s.djCounts.ouro>=1 },
+  { id:"twin",      icon:"🧠", name:"Mente Gêmea",            desc:"5 acertos de Previsão ou Pergunta Sincro.",               check:s=>s.mindHits>=5 },
+  { id:"ear",       icon:"🎧", name:"Ouvido Absoluto",        desc:"Alcance o nível 5 no Eco do Ritmo.",                      check:s=>s.simonBest>=5 },
+  { id:"balance",   icon:"🤸", name:"Equilibrista",           desc:"Fique 30 segundos no Equilíbrio do Casal.",               check:s=>s.balanceRecord>=30 },
+  { id:"riddle",    icon:"🗝️", name:"Mestre dos Enigmas",     desc:"Abra o Cofre Dourado decifrando enigmas.",                check:s=>s.goldenUnlocked },
+  { id:"body",      icon:"🏆", name:"Corpo Sábio",            desc:"Gabarite o Quiz do Corpo (8/8).",                         check:s=>s.quizBest>=8 },
+  { id:"night",     icon:"🌙", name:"Noite Completa",         desc:"Ganhe sintonia nos três jogos.",                          check:s=>s.touchedGames.desejos&&s.touchedGames.sentidos&&s.touchedGames.movimento },
+  { id:"brasa",     icon:"🔥", name:"Chama Eterna",           desc:"Desbloqueie o nível Brasa.",                              check:s=>s.djCounts.chama>=6 },
+  { id:"senses",    icon:"👁️", name:"Sentidos Despertados",   desc:"Complete as 3 missões de um sentido.",                    check:s=>Object.values(s.senses).some(v=>v>=3) },
+  { id:"collector", icon:"🃏", name:"Colecionador de Momentos", desc:"Jogue 20 cartas ao total.",                              check:s=>s.djCounts.fagulha+s.djCounts.chama+s.djCounts.brasa+s.djCounts.ouro>=20 },
+  { id:"roleta",    icon:"🎡", name:"Sorte Grande",            desc:"Gire a Roleta do Prazer 10 vezes.",                       check:s=>s.roletaSpins>=10 },
+  { id:"fire3",     icon:"🔥", name:"Em Chamas",               desc:"Cumpra 3 desafios da Roleta em sequência.",               check:s=>s.roletaStreakBest>=3 },
+  { id:"seduz",     icon:"💋", name:"Arte Finalizada",         desc:"Complete as 5 etapas da Arte da Sedução.",                check:s=>s.sedStages>=5 },
+  { id:"acad",      icon:"🎓", name:"Formado(a) com Louvor",   desc:"Conclua os 6 módulos da Academia da Intimidade.",         check:s=>s.acadMods>=6 },
+  { id:"unl",       icon:"🔓", name:"Chave-Mestra",            desc:"Termine as 6 fases de Desbloqueie a Intimidade.",         check:s=>s.unlPhases>=6 },
+  { id:"sete",      icon:"👑", name:"Sete Chamas",             desc:"Ganhe sintonia em todos os 7 jogos.",                     check:s=>Object.values(s.touchedGames).every(v=>v) }
+];
+</script>
+<script>
+/* ============================================================
+   ENTRE NÓS — motor do jogo
+============================================================ */
+const $=s=>document.querySelector(s);
+const $$=s=>Array.from(document.querySelectorAll(s));
+const PAD_COLORS=['#ff6b8b','#f2c66d','#5eead4','#a78bfa'];
+
+/* ============ ESTADO ============ */
+const KEY='entreNos_v2';
+function defaultState(){return{
+  sintonia:0, mindHits:0,
+  djCounts:{fagulha:0,chama:0,brasa:0,ouro:0},
+  djPlayed:{fagulha:[],chama:[],brasa:[],ouro:[]},
+  chaves:[], goldenUnlocked:false,
+  senses:{visao:0,audicao:0,tato:0,olfato:0,paladar:0},
+  exDone:[], quizBest:0, simonBest:0, balanceRecord:0,
+  touchedGames:{desejos:false,sentidos:false,movimento:false,seducao:false,roleta:false,academia:false,desbloqueio:false},
+  sedDone:{}, sedStages:0,
+  roletaSpins:0, roletaStreak:0, roletaStreakBest:0,
+  acadDone:{}, acadXP:0, acadMods:0,
+  unlDone:{}, unlPhases:0,
+  achievements:[], muted:false
+};}
+function loadState(){try{const raw=localStorage.getItem(KEY);if(raw){const d=defaultState(),s=JSON.parse(raw);
+  return {...d,...s,djCounts:{...d.djCounts,...(s.djCounts||{})},djPlayed:{...d.djPlayed,...(s.djPlayed||{})},senses:{...d.senses,...(s.senses||{})},touchedGames:{...d.touchedGames,...(s.touchedGames||{})},sedDone:{...d.sedDone,...(s.sedDone||{})},acadDone:{...d.acadDone,...(s.acadDone||{})},unlDone:{...d.unlDone,...(s.unlDone||{})}};
+}}catch(e){}return defaultState();}
+let state=loadState();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+
+function norm(v){return (v||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();}
+function fmt(sec){sec=Math.max(0,sec|0);return String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0');}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+/* ============ ÁUDIO (WebAudio) ============ */
+let AC=null;
+function beep(freq,dur,type,vol,delay){if(state.muted)return;try{
+  AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+  const t=AC.currentTime+(delay||0);
+  const o=AC.createOscillator(),g=AC.createGain();
+  o.type=type||'sine';o.frequency.setValueAtTime(freq,t);
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(vol||0.12,t+0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+(dur||0.12));
+  o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+(dur||0.12)+0.06);
+}catch(e){}}
+const SFX={
+  click:()=>beep(520,0.06,'sine',0.05),
+  good:()=>{beep(660,0.12,'sine',0.1);beep(880,0.16,'sine',0.1,0.1);},
+  bad:()=>beep(180,0.25,'sawtooth',0.07),
+  tick:()=>beep(760,0.05,'sine',0.04),
+  unlock:()=>[523,659,784,1047].forEach((f,i)=>beep(f,0.18,'triangle',0.1,i*0.09)),
+  pad:i=>beep([329.6,392,523.3,659.3][i]||440,0.28,'sine',0.15)
+};
+
+/* ============ TOASTS ============ */
+function toast(msg,icon,cls){
+  const t=document.createElement('div');
+  t.className='toast'+(cls?' '+cls:'');
+  t.innerHTML='<span class="t-ic">'+(icon||'✦')+'</span><span>'+msg+'</span>';
+  $('#toasts').appendChild(t);
+  requestAnimationFrame(()=>t.classList.add('show'));
+  setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),400);},3200);
+}
+function toastAch(a){toast('<b>Nova conquista:</b> '+a.name,a.icon,'ach');beep(880,0.3,'triangle',0.1);}
+
+/* ============ PONTOS & CONQUISTAS ============ */
+function updateHUD(){$('#hud-points').textContent=state.sintonia;}
+function addPoints(n,game){
+  state.sintonia+=n;
+  if(game&&state.touchedGames[game]===false)state.touchedGames[game]=true;
+  updateHUD();save();checkAch();
+  toast('+'+n+' de sintonia','🔥');
+}
+function addMindHit(){state.mindHits++;save();checkAch();}
+function checkAch(){
+  ACHIEVEMENTS.forEach(a=>{
+    if(!state.achievements.includes(a.id)){
+      let ok=false;try{ok=a.check(state);}catch(e){}
+      if(ok){state.achievements.push(a.id);toastAch(a);save();}
+    }
+  });
+}
+function totalCards(){return state.djCounts.fagulha+state.djCounts.chama+state.djCounts.brasa+state.djCounts.ouro;}
+
+/* ============ TELAS ============ */
+function show(id){
+  $$('.screen').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById(id);
+  if(el)el.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function goHome(){show('screen-home');renderHome();}
+
+/* ============ MODAL ============ */
+let modalToken=0,modalIntervals=[];
+function regInterval(iv){modalIntervals.push(iv);return iv;}
+function openModal(html){
+  modalToken++;modalIntervals=[];
+  $('#modal-box').innerHTML='<button class="modal-close" title="Fechar">✕</button>'+html;
+  $('#modal').classList.remove('hidden');
+  const c=$('#modal-box .modal-close');if(c)c.onclick=closeModal;
+}
+function closeModal(){
+  modalToken++;modalIntervals.forEach(clearInterval);modalIntervals=[];
+  $('#modal').classList.add('hidden');$('#modal-box').innerHTML='';
+}
+$('#modal').addEventListener('click',e=>{if(e.target.classList.contains('modal-back'))closeModal();});
+
+/* ============ TIMER ============ */
+function timerHTML(id,seconds){
+  return '<div class="timer"><div class="t-time" id="'+id+'">'+fmt(seconds)+'</div>'+
+  '<div class="t-btns"><button class="btn small" id="'+id+'-s">▶ Iniciar</button>'+
+  '<button class="btn ghost small" id="'+id+'-r">Zerar</button></div></div>';
+}
+function mountTimer(id,seconds,onEnd){
+  const tk=modalToken;let left=seconds,iv=null;
+  function upd(){const e=document.getElementById(id);if(e)e.textContent=fmt(left);}
+  function stop(){if(iv){clearInterval(iv);iv=null;}const b=document.getElementById(id+'-s');if(b)b.textContent='▶ Iniciar';}
+  function tick(){if(tk!==modalToken){stop();return;}left--;upd();
+    if(left<=0){stop();SFX.good();if(onEnd)onEnd();}else if(left<=5)SFX.tick();}
+  function start(){if(iv){stop();}else{iv=regInterval(setInterval(tick,1000));const b=document.getElementById(id+'-s');if(b)b.textContent='⏸ Pausar';}}
+  const s=document.getElementById(id+'-s'),r=document.getElementById(id+'-r');
+  if(s)s.onclick=start;if(r)r.onclick=()=>{stop();left=seconds;upd();};
+  upd();return stop;
+}
+
+/* ============ HOME ============ */
+function renderHome(){
+  $('#stat-cards').textContent=totalCards();
+  $('#stat-mind').textContent=state.mindHits;
+  $('#stat-simon').textContent=state.simonBest;
+  $('#stat-bal').textContent=state.balanceRecord+'s';
+  $('#stat-roleta').textContent=state.roletaSpins;
+  $('#stat-acad').textContent=state.acadXP;
+  $('#ach-grid').innerHTML=ACHIEVEMENTS.map(a=>{
+    const u=state.achievements.includes(a.id);
+    return '<div class="badge'+(u?'':' locked')+'"><div class="b-ic">'+a.icon+'</div><div class="b-n">'+a.name+'</div><div class="b-d">'+(u?a.desc:'??? — continue jogando')+'</div></div>';
+  }).join('');
+  updateHUD();
+}
+
+/* ============ DESEJOS SECRETOS ============ */
+const DJ_LEVELS=[
+  {id:'fagulha',needTxt:''},
+  {id:'chama',needTxt:'Jogue 6 cartas de Fagulha'},
+  {id:'brasa',needTxt:'Jogue 6 cartas de Chama'},
+  {id:'ouro',needTxt:'Decifre 2 enigmas do Cofre',special:true}
+];
+function levelUnlocked(id){
+  if(id==='fagulha')return true;
+  if(id==='chama')return state.djCounts.fagulha>=6;
+  if(id==='brasa')return state.djCounts.chama>=6;
+  if(id==='ouro')return state.goldenUnlocked;
+  return false;
+}
+let curLevel=null,curCardIdx=null,revealed=false;
+function remCards(){const arr=state.djPlayed[curLevel];return DESEJOS[curLevel].cards.map((c,i)=>i).filter(i=>!arr.includes(i));}
+function drawCard(){
+  if(!curLevel)return;
+  const rem=remCards();
+  if(!rem.length){curCardIdx=null;renderCardArea();return;}
+  curCardIdx=rem[Math.floor(Math.random()*rem.length)];
+  revealed=false;SFX.click();
+  renderCardArea();
+}
+
+function renderDesejos(){
+  $('#dj-levels').classList.remove('hidden');
+  $('#deck-area').classList.add('hidden');
+  $('#dj-levels').innerHTML='<div class="level-grid">'+DJ_LEVELS.map(L=>{
+    const d=DESEJOS[L.id],un=levelUnlocked(L.id);
+    const played=state.djPlayed[L.id].length,total=d.cards.length;
+    let lock='';
+    if(!un){
+      if(L.special)lock='🔒 '+state.chaves.length+'/2 chaves — '+L.needTxt;
+      else lock='🔒 '+L.needTxt+' ('+Math.min(state.djCounts[L.id==='chama'?'fagulha':'chama'],6)+'/6)';
+    }
+    return '<button class="level-card'+(un?'':' locked')+(L.special?' l-gold':'')+'" data-level="'+L.id+'">'+
+      '<div class="l-ic">'+d.icon+'</div><h4>'+d.name+'</h4><p>'+d.sub+'</p>'+
+      (un?'<div class="l-prog"><div class="progress"><i style="width:'+(played/total*100)+'%"></i></div><p style="margin-top:7px;font-size:12px">'+played+'/'+total+' cartas reveladas</p></div>':'<div class="l-lock">'+lock+'</div>')+
+      '</button>';
+  }).join('')+'</div>';
+  $$('#dj-levels [data-level]').forEach(b=>b.onclick=()=>{
+    const id=b.getAttribute('data-level');
+    SFX.click();
+    if(levelUnlocked(id)){openLevel(id);}
+    else if(id==='ouro'){openVault();}
+    else{SFX.bad();toast(DJ_LEVELS.find(x=>x.id===id).needTxt,'🔒');}
+  });
+}
+function openLevel(id){curLevel=id;curCardIdx=null;revealed=false;renderDeck();}
+function renderDeck(){
+  $('#dj-levels').classList.add('hidden');
+  $('#deck-area').classList.remove('hidden');
+  renderCardArea();
+}
+function renderCardArea(){
+  const area=$('#deck-area'),d=DESEJOS[curLevel];
+  const played=state.djPlayed[curLevel].length,total=d.cards.length;
+  let inner;
+  if(curCardIdx===null){
+    const rem=remCards().length;
+    inner=rem===0
+      ?'<div class="deck-done"><div class="emoji3d">🎉</div><h3 style="font-family:var(--fh);margin:12px 0 6px">Baralho completo!</h3><p class="mech-hint">Você virou todas as '+total+' cartas de '+d.name+'.</p><div class="row" style="margin-top:18px"><button class="btn gold" id="dj-reshuffle">↻ Embaralhar de novo</button><button class="btn ghost" id="dj-back2">Trocar nível</button></div></div>'
+      :'<div class="deck-done"><div class="emoji3d">'+d.icon+'</div><h3 style="font-family:var(--fh);margin:12px 0 6px">'+d.name+'</h3><p class="mech-hint">'+rem+' carta'+(rem>1?'s':'')+' restante'+(rem>1?'s':'')+' no baralho.</p><div class="row" style="margin-top:18px"><button class="btn" id="dj-draw">🃏 Sacar carta</button><button class="btn ghost" id="dj-back2">Trocar nível</button></div></div>';
+  }else{
+    const c=DESEJOS[curLevel].cards[curCardIdx],tm=TYPE_META[c.t];
+    inner='<div class="flip" id="flip"><div class="flip-inner">'+
+      '<div class="face front" id="card-front"><div class="fm">✦ ENTRE NÓS ✦</div><div class="f-star">✦</div><div class="f-tap">toque para revelar</div></div>'+
+      '<div class="face back"><span class="t-type '+tm.cls+'">'+tm.ic+' '+tm.n+'</span><div class="t-text">'+c.x+'</div>'+(c.s?'<div class="t-sub">'+c.s+'</div>':'')+'</div>'+
+      '</div></div><div class="mech hidden" id="mech"></div>';
+  }
+  area.innerHTML='<div class="deck-top"><div class="dt-info"><span class="deck-count">'+d.icon+' '+d.name+' · '+played+'/'+total+'</span><div class="progress"><i style="width:'+(played/total*100)+'%"></i></div></div><button class="btn ghost small" id="dj-back">Trocar nível</button></div>'+inner;
+  $('#dj-back').onclick=backToLevels;
+  const b2=$('#dj-back2');if(b2)b2.onclick=backToLevels;
+  const bd=$('#dj-draw');if(bd)bd.onclick=drawCard;
+  const br=$('#dj-reshuffle');if(br)br.onclick=()=>{state.djPlayed[curLevel]=[];save();SFX.unlock();curCardIdx=null;renderCardArea();};
+  const cf=$('#card-front');
+  if(cf)cf.onclick=()=>{if(revealed)return;revealed=true;$('#flip').classList.add('revealed');SFX.click();beep(392,0.2,'triangle',0.08,0.15);renderMech();};
+}
+function renderMech(){
+  const c=DESEJOS[curLevel].cards[curCardIdx];
+  const m=$('#mech');if(!m)return;m.classList.remove('hidden');
+  let h='';
+  if(c.t==='verdade'){
+    h='<div class="mech-hint">Respondam com o coração — aqui não existe julgamento.</div><button class="btn" id="mc-ok">💭 Respondido · +2</button>';
+  }else if(c.t==='missao'){
+    h='<div class="mech-hint">Sem pressa: o que importa é a entrega, não a perfeição.</div>'+
+      '<div id="m-timer-slot"></div>'+
+      '<div class="row"><button class="btn ghost small" id="mc-timer">⏱ Timer 60s</button><button class="btn" id="mc-ok">🎯 Missão cumprida · +3</button></div>';
+  }else if(c.t==='escolha'){
+    h='<div class="mech-steps">🤫 <b>Em segredo</b>: cada um escolhe uma das opções. Na contagem de 3, revelem juntos — se igualarem, a sintonia é enorme.</div>'+
+      '<div class="row"><button class="btn mint" id="mc-hit">✨ Bateu! · +3</button><button class="btn ghost" id="mc-miss">Diferente · +1</button></div>';
+  }else if(c.t==='previsao'){
+    h='<div class="mech-steps">🧠 <b>Passo 1</b> — ANTES da resposta: o par prevê em voz alta o que você vai responder.<br><b>Passo 2</b> — Só então, dê a resposta real e compare.</div>'+
+      '<div class="row"><button class="btn mint" id="mc-hit">🔮 Acertou a previsão! · +3</button><button class="btn ghost" id="mc-miss">Errou · +1</button></div>';
+  }
+  m.innerHTML=h;
+  const ok=$('#mc-ok');
+  if(ok)ok.onclick=()=>finishCard(c.t==='missao'?3:2,false);
+  const hit=$('#mc-hit');
+  if(hit)hit.onclick=()=>{addMindHit();finishCard(3,true);};
+  const miss=$('#mc-miss');
+  if(miss)miss.onclick=()=>finishCard(1,false);
+  const bt=$('#mc-timer');
+  if(bt)bt.onclick=()=>{bt.classList.add('hidden');$('#m-timer-slot').innerHTML=timerHTML('mt',60);mountTimer('mt',60);};
+}
+function finishCard(pts,hit){
+  state.djCounts[curLevel]++;
+  state.djPlayed[curLevel].push(curCardIdx);
+  save();
+  SFX.good();
+  addPoints(pts,'desejos');
+  curCardIdx=null;revealed=false;
+  renderCardArea();
+}
+function backToLevels(){curLevel=null;curCardIdx=null;renderDesejos();}
+
+/* ============ COFRE (ENIGMAS) ============ */
+function openVault(){
+  openModal('<h3>🗝️ Cofre Dourado</h3><p class="m-desc">Cada enigma decifrado vale uma chave. Com <b style="color:var(--gold)">'+state.chaves.length+'/2 chaves</b>, o cofre abre — e revela o baralho mais raro do jogo.</p>'+
+    RIDDLES.map((r,i)=>{
+      if(state.chaves.includes(i))return '<div class="riddle-item solved"><div class="riddle-q">'+(i+1)+'. '+r.q+'</div><div style="color:var(--mint);font-weight:600;font-size:14px">✅ Decifrado</div></div>';
+      return '<div class="riddle-item"><div class="riddle-q">'+(i+1)+'. '+r.q+'</div><div class="riddle-row"><input id="ri-'+i+'" placeholder="Sua resposta..." autocomplete="off"><button class="btn small" data-ri="'+i+'">Decifrar</button></div></div>';
+    }).join('')+
+    (state.chaves.length>=2?'':'<p class="mech-hint">Dica: as respostas são simples — pense no tema da noite. 😉</p>'));
+  $$('#modal-box [data-ri]').forEach(b=>b.onclick=()=>tryRiddle(parseInt(b.getAttribute('data-ri'),10)));
+  $$('#modal-box [id^=ri-]').forEach(inp=>inp.addEventListener('keydown',e=>{if(e.key==='Enter')tryRiddle(parseInt(inp.id.split('-')[1],10));}));
+}
+function tryRiddle(i){
+  const inp=$('#ri-'+i);if(!inp)return;
+  const v=norm(inp.value);
+  const ok=RIDDLES[i].a.some(a=>v.includes(norm(a)));
+  if(ok){
+    state.chaves.push(i);
+    SFX.unlock();
+    if(state.chaves.length>=2&&!state.goldenUnlocked){state.goldenUnlocked=true;save();toast('🗝️ O Cofre Dourado foi aberto!','🗝️');}
+    else toast('Enigma decifrado! Chave guardada.','🗝️');
+    save();checkAch();
+    openVault();
+  }else{
+    SFX.bad();inp.classList.add('shake');
+    setTimeout(()=>inp.classList.remove('shake'),450);
+    inp.value='';inp.placeholder='Não é isso... tente de novo!';
+  }
+}
+
+/* ============ CINCO SENTIDOS ============ */
+let curSense='visao';
+function renderSentidos(){
+  $('#sense-tabs').innerHTML=SENSES.map(s=>{
+    const done=state.senses[s.id];
+    return '<button class="tab'+(s.id===curSense?' active':'')+'" data-sense="'+s.id+'"><span class="tab-ic">'+s.icon+'</span><span class="tab-n">'+s.name+'</span><span class="sense-dots">'+[0,1,2].map(i=>'<i class="'+(i<done?'on':'')+'"></i>').join('')+'</span></button>';
+  }).join('');
+  $$('#sense-tabs [data-sense]').forEach(b=>b.onclick=()=>{curSense=b.getAttribute('data-sense');SFX.click();renderSentidos();});
+  const s=SENSES.find(x=>x.id===curSense);
+  $('#sense-content').innerHTML='<div class="mission-list">'+s.missions.map((m,i)=>{
+    const un=i<=state.senses[s.id],done=i<state.senses[s.id];
+    return '<button class="mission-card'+(un?'':' locked')+(done?' done':'')+'" data-mi="'+i+'">'+
+      '<span class="m-num">'+(done?'✓':(i+1))+'</span>'+
+      '<span class="m-body"><h4>'+m.t+'</h4><p>'+(un?m.d:'Complete a missão anterior para desbloquear.')+'</p></span>'+
+      '<span class="m-st">'+(done?'🌟':(un?'▶':'🔒'))+'</span></button>';
+  }).join('')+'</div>';
+  $$('#sense-content [data-mi]').forEach(b=>b.onclick=()=>{
+    const i=parseInt(b.getAttribute('data-mi'),10);
+    if(i<=state.senses[s.id])openMission(s.id,i);else SFX.bad();
+  });
+}
+function openMission(sId,mIdx){
+  const s=SENSES.find(x=>x.id===sId),m=s.missions[mIdx];
+  let h='<h3>'+s.icon+' '+m.t+' <span class="mind-chip">Nível '+(mIdx+1)+'</span></h3><p class="m-desc">'+m.d+'</p><div id="mission-a">'+
+    '<ol class="steps">'+m.steps.map(x=>'<li>'+x+'</li>').join('')+'</ol>';
+  if(m.timer)h+=timerHTML('mtm',m.timer);
+  if(m.mg==='simon')h+=simonEmbed();
+  if(m.mg==='emoji')h+=emojiEmbed();
+  h+='<div class="row" style="margin-top:14px"><button class="btn" id="m-to-b">Concluímos os passos →</button></div></div>';
+  h+='<div id="mission-b" class="hidden"><div class="mind-label">🧠 Momento Mente · Pergunta Sincro</div>'+
+    '<p class="sync-q">'+m.sync+'</p><p class="sync-hint">Contagem de 3... cada um responde em voz alta, ao mesmo tempo.</p>'+
+    '<div class="row"><button class="btn mint" id="sync-hit">✨ Bateu! · +3</button><button class="btn ghost" id="sync-miss">Não bateu · +1</button></div>'+
+    '<div class="divider"></div><div class="row"><button class="btn gold" id="mission-done">Finalizar missão · +'+m.pts+'</button></div></div>';
+  openModal(h);
+  if(m.timer)mountTimer('mtm',m.timer);
+  if(m.mg==='simon')bindSimon(()=>{state.simonBest=Math.max(state.simonBest,5);save();toast('Sequência dominada!','🎧');showPhaseB();});
+  if(m.mg==='emoji')bindEmoji(score=>{toast(score+'/3 posições na memória','🧠');showPhaseB();});
+  $('#m-to-b').onclick=()=>{SFX.click();showPhaseB();};
+  $('#sync-hit').onclick=e=>{e.target.disabled=true;$('#sync-miss').disabled=true;addMindHit();addPoints(3,'sentidos');SFX.good();};
+  $('#sync-miss').onclick=e=>{e.target.disabled=true;$('#sync-hit').disabled=true;addPoints(1,'sentidos');SFX.click();};
+  $('#mission-done').onclick=()=>{
+    state.senses[sId]=Math.max(state.senses[sId],mIdx+1);
+    save();SFX.good();addPoints(m.pts,'sentidos');
+    closeModal();renderSentidos();
+  };
+}
+function showPhaseB(){
+  const a=$('#mission-a'),b=$('#mission-b');
+  if(a)a.classList.add('hidden');
+  if(b)b.classList.remove('hidden');
+}
+
+/* ---------- mini-game: Eco do Ritmo (Simon) ---------- */
+function simonEmbed(){
+  return '<div class="mind-label">🧠 Mini-game · Eco do Ritmo</div>'+
+    '<div class="sg-status" id="sg-status">Chegue ao nível 5 — a sequência cresce a cada rodada.</div>'+
+    '<div class="pads" id="sg-pads">'+[0,1,2,3].map(i=>'<button class="pad" style="--c:'+PAD_COLORS[i]+'" data-pad="'+i+'" aria-label="pad '+i+'"></button>').join('')+'</div>'+
+    '<div class="row"><button class="btn small" id="sg-start">▶ Ouvir sequência</button><button class="btn ghost small hidden" id="sg-retry">↻ Recomeçar</button></div>';
+}
+function bindSimon(onWin){
+  const pads=$$('#sg-pads .pad'),tk=modalToken,status=$('#sg-status');
+  const TO=(f,ms)=>setTimeout(()=>{if(tk===modalToken)f();},ms);
+  let seq=[],pos=0,level=1,playing=false;
+  function flash(i,d){if(!pads[i])return;pads[i].classList.add('lit');SFX.pad(i);TO(()=>{if(pads[i])pads[i].classList.remove('lit');},d);}
+  function playback(){
+    playing=true;status.textContent='Rodada '+level+' — ouça e observe...';
+    pads.forEach(p=>p.style.pointerEvents='none');
+    seq=Array.from({length:level+2},()=>Math.floor(Math.random()*4));pos=0;
+    seq.forEach((p,k)=>TO(()=>flash(p,360),650+k*600));
+    TO(()=>{pads.forEach(p=>p.style.pointerEvents='auto');playing=false;status.textContent='Sua vez — repita os '+seq.length+' toques';},650+seq.length*600);
+  }
+  const st=$('#sg-start');if(st)st.onclick=()=>{st.classList.add('hidden');playback();};
+  const rt=$('#sg-retry');if(rt)rt.onclick=()=>{rt.classList.add('hidden');playback();};
+  pads.forEach((p,i)=>p.onclick=()=>{
+    if(playing||!seq.length||pos>=seq.length)return;
+    flash(i,170);
+    if(i===seq[pos]){
+      pos++;
+      if(pos===seq.length){
+        if(seq.length>=5){playing=true;status.textContent='Sequência dominada! 🎉';SFX.good();onWin(seq.length);}
+        else{playing=true;status.textContent='Perfeito! Preparando a próxima rodada...';SFX.good();level++;TO(playback,1000);}
+      }
+    }else{
+      SFX.bad();playing=true;status.textContent='A sequência quebrou! Respire e tente de novo.';
+      const r=$('#sg-retry');if(r)r.classList.remove('hidden');
+    }
+  });
+}
+
+/* ---------- mini-game: Detalhes Roubados (memória visual) ---------- */
+function emojiEmbed(){
+  return '<div class="mind-label">🧠 Mini-game · Detalhes Roubados</div>'+
+    '<div class="e-status" id="em-status">A cena aparece por 8 segundos — depois some.</div>'+
+    '<div class="egrid" id="em-grid"></div>'+
+    '<div class="row"><button class="btn small" id="em-start">👀 Mostrar cena</button></div>';
+}
+function bindEmoji(onDone){
+  const grid=$('#em-grid'),status=$('#em-status'),tk=modalToken;
+  const POOL=['🍓','🌵','🎩','🐙','🍕','🚀','🧸','🌈','🔔','🍩','🐧','⚽','🌻','🎺','🦊','🍇','🍉','🎧','🦋','🍋','🧩','🪁'];
+  let cells=[],score=0,qNum=0,asked=[];
+  function ask(){
+    if(qNum>=3){status.textContent='Fim! '+score+'/3 posições certas.';onDone(score);return;}
+    let idx;do{idx=Math.floor(Math.random()*16);}while(asked.includes(idx));
+    asked.push(idx);qNum++;
+    const r=Math.floor(idx/4)+1,c=(idx%4)+1;
+    const correct=cells[idx];
+    const others=cells.filter((e,i)=>i!==idx&&e!==correct);
+    const opts=shuffle([correct,others[0],others[1],others[2]]);
+    grid.querySelectorAll('.ecell').forEach((el,i)=>{if(asked.includes(i))el.classList.add('hintcell');});
+    status.textContent='Questão '+qNum+'/3 — '+score+' acerto'+(score===1?'':'s')+' até agora';
+    grid.insertAdjacentHTML('beforebegin','<div class="eq-prompt" id="em-q"></div>');
+    $('#em-q').textContent='Linha '+r+', coluna '+c+': qual emoji estava ali?';
+    grid.insertAdjacentHTML('afterend','<div class="e-opts" id="em-opts"></div>');
+    $('#em-opts').innerHTML=opts.map(o=>'<button class="e-opt" data-e="'+o+'">'+o+'</button>').join('');
+    $$('#em-opts .e-opt').forEach(b=>b.onclick=()=>{
+      const v=b.getAttribute('data-e');
+      $$('#em-opts .e-opt').forEach(x=>{x.disabled=true;if(x.getAttribute('data-e')===correct)x.classList.add('right');});
+      if(v===correct){score++;SFX.good();}else{b.classList.add('wrongp');SFX.bad();}
+      TO(next,950);
+    });
+  }
+  function next(){
+    const q=$('#em-q'),o=$('#em-opts');
+    if(q)q.remove();if(o)o.remove();
+    ask();
+  }
+  const TO=(f,ms)=>setTimeout(()=>{if(tk===modalToken)f();},ms);
+  $('#em-start').onclick=()=>{
+    $('#em-start').classList.add('hidden');
+    cells=shuffle([...POOL]).slice(0,16);
+    grid.innerHTML=cells.map(e=>'<div class="ecell">'+e+'</div>').join('');
+    let left=8;status.textContent='Memorize! '+left+'s';
+    const iv=regInterval(setInterval(()=>{
+      if(tk!==modalToken){clearInterval(iv);return;}
+      left--;
+      if(left>0){status.textContent='Memorize! '+left+'s';if(left<=3)SFX.tick();}
+      else{
+        clearInterval(iv);
+        status.textContent='Cena oculta! Onde estava cada coisa?';
+        grid.querySelectorAll('.ecell').forEach(el=>{el.textContent='❓';el.style.opacity=.6;});
+        TO(ask,600);
+      }
+    },1000));
+  };
+}
+
+/* ============ MOVIMENTO & SINTONIA ============ */
+let mvTab='desafios';
+function renderMovimento(){
+  const tabs=[['desafios','💪','Desafios a Dois'],['quiz','🧠','Quiz do Corpo'],['recorde','🏆','Recordes']];
+  $('#mv-tabs').innerHTML=tabs.map(t=>'<button class="tab'+(mvTab===t[0]?' active':'')+'" data-mv="'+t[0]+'"><span class="tab-ic">'+t[1]+'</span><span class="tab-n">'+t[2]+'</span></button>').join('');
+  $$('#mv-tabs [data-mv]').forEach(b=>b.onclick=()=>{mvTab=b.getAttribute('data-mv');SFX.click();renderMovimento();});
+  const c=$('#mv-content');
+  if(mvTab==='desafios'){
+    c.innerHTML='<div class="ex-grid">'+EXERCISES.map(e=>{
+      const done=state.exDone.includes(e.id);
+      return '<button class="ex-card'+(done?' done-ex':'')+'" data-ex="'+e.id+'"><span class="svg-art">'+e.svg+'</span><span class="ex-info"><span class="ex-meta">'+e.meta+'</span><h4>'+e.icon+' '+e.name+'</h4><p>'+e.obj+'</p>'+(done?'<div class="ex-done-flag">✓ Concluído nesta noite</div>':'')+'</span></button>';
+    }).join('')+'</div>';
+    $$('#mv-content [data-ex]').forEach(b=>b.onclick=()=>openExercise(b.getAttribute('data-ex')));
+  }else if(mvTab==='quiz'){
+    renderQuiz();
+  }else{
+    c.innerHTML='<div class="stats-grid" style="max-width:560px;margin:10px auto">'+
+      '<div class="stat"><div class="s-num">'+state.balanceRecord+'s</div><div class="s-l">Equilíbrio a dois</div></div>'+
+      '<div class="stat"><div class="s-num">'+state.simonBest+'</div><div class="s-l">Eco do Ritmo</div></div>'+
+      '<div class="stat"><div class="s-num">'+state.quizBest+'/8</div><div class="s-l">Quiz do Corpo</div></div>'+
+      '</div><div class="row" style="margin-top:18px"><button class="btn" id="btn-balance">🤸 Abrir cronômetro de equilíbrio</button></div>';
+    $('#btn-balance').onclick=openBalance;
+  }
+}
+function openExercise(id){
+  const e=EXERCISES.find(x=>x.id===id);
+  let h='<h3>'+e.icon+' '+e.name+'</h3><div class="modal-art"><span class="svg-art">'+e.svg+'</span></div>'+
+    '<p class="m-desc"><b style="color:var(--text)">Objetivo:</b> '+e.obj+'</p>'+
+    '<ol class="steps">'+e.passos.map(p=>'<li>'+p+'</li>').join('')+'</ol>'+
+    '<div class="tecnica-box">📐 <b>Técnica &amp; ângulos:</b> '+e.tec+'</div>'+
+    '<div class="adapt-box"><h5>⚙️ Adaptações para diferentes corpos</h5><ul>'+e.adapt.map(a=>'<li>'+a+'</li>').join('')+'</ul></div>';
+  if(e.timer)h+=timerHTML('ext',e.timer);
+  h+='<div class="row" style="margin-top:16px">'+
+    (e.stopwatch?'<button class="btn ghost" id="ex-stopwatch">⏱ Cronômetro de equilíbrio</button>':'')+
+    '<button class="btn" id="ex-done">Concluímos! · +'+e.pts+'</button></div>';
+  openModal(h);
+  if(e.timer)mountTimer('ext',e.timer);
+  const sw=$('#ex-stopwatch');
+  if(sw)sw.onclick=openBalance;
+  $('#ex-done').onclick=()=>{
+    if(!state.exDone.includes(e.id))state.exDone.push(e.id);
+    save();SFX.good();addPoints(e.pts,'movimento');closeModal();renderMovimento();
+  };
+}
+
+/* ---------- Quiz do Corpo ---------- */
+let quizState=null;
+function renderQuiz(){
+  if(!quizState)quizState={i:0,score:0};
+  const c=$('#mv-content');
+  if(quizState.i>=QUIZ.length){
+    const s=quizState.score;
+    if(s>state.quizBest){state.quizBest=s;save();}
+    checkAch();
+    c.innerHTML='<div class="quiz-wrap quiz-end"><div class="emoji3d">'+(s===8?'🏆':(s>=6?'💜':'🧠'))+'</div><div class="quiz-score">'+s+'/8</div>'+
+      '<p class="mech-hint" style="margin-top:10px">'+(s===8?'Gabaritou! Seu cérebro conhece o corpo de vocês.':(s>=6?'Impressionante — faltou pouco para o gabarito.':'Agora vocês sabem o que estudar... na prática.'))+'</p>'+
+      '<p class="mech-hint" style="margin-top:6px">Recorde: '+state.quizBest+'/8</p>'+
+      '<div class="row" style="margin-top:18px"><button class="btn" id="qz-again">↻ Responder de novo</button></div></div>';
+    $('#qz-again').onclick=()=>{quizState={i:0,score:0};renderQuiz();};
+    return;
+  }
+  const q=QUIZ[quizState.i];
+  c.innerHTML='<div class="quiz-wrap"><div class="quiz-prog"><span>Pergunta '+(quizState.i+1)+'/'+QUIZ.length+'</span><div class="progress"><i style="width:'+(quizState.i/QUIZ.length*100)+'%"></i></div><span>✓ '+quizState.score+'</span></div>'+
+    '<div class="quiz-q">'+q.q+'</div><div class="quiz-opts">'+q.o.map((o,i)=>'<button class="quiz-opt" data-qi="'+i+'">'+o+'</button>').join('')+'</div><div id="qz-after"></div></div>';
+  $$('#mv-content .quiz-opt').forEach(b=>b.onclick=()=>{
+    const i=parseInt(b.getAttribute('data-qi'),10);
+    $$('#mv-content .quiz-opt').forEach(x=>{x.disabled=true;if(x.getAttribute('data-qi')==q.c)x.classList.add('correct');});
+    if(i===q.c){quizState.score++;SFX.good();addPoints(2,'movimento');}
+    else{b.classList.add('wrong');SFX.bad();}
+    quizState.i++;
+    $('#qz-after').innerHTML='<div class="quiz-why"><b>Por quê?</b> '+q.w+'</div><div class="row" style="margin-top:14px"><button class="btn" id="qz-next">'+(quizState.i>=QUIZ.length?'Ver resultado →':'Próxima pergunta →')+'</button></div>';
+    $('#qz-next').onclick=()=>{SFX.click();renderQuiz();};
+  });
+}
+
+/* ---------- Cronômetro de equilíbrio ---------- */
+function openBalance(){
+  openModal('<h3>🤸 Equilíbrio do Casal</h3><p class="m-desc">Segurem as mãos e cada um levanta um pé. O cronômetro corre até alguém tocar o chão. <br>Recorde atual: <b style="color:var(--gold)">'+state.balanceRecord+'s</b></p>'+
+    '<div class="timer"><div class="t-time big" id="bs-t">00:00</div></div>'+
+    '<div class="row"><button class="btn" id="bs-start">▶ Começar</button><button class="btn ghost hidden" id="bs-stop">✋ Parei!</button></div>');
+  const tk=modalToken;let s=0,iv=null;
+  $('#bs-start').onclick=()=>{
+    $('#bs-start').classList.add('hidden');$('#bs-stop').classList.remove('hidden');
+    s=0;SFX.click();
+    iv=regInterval(setInterval(()=>{
+      if(tk!==modalToken){clearInterval(iv);return;}
+      s++;const el=$('#bs-t');if(el)el.textContent=fmt(s);
+      if(s===30)SFX.unlock();
+    },1000));
+  };
+  $('#bs-stop').onclick=()=>{
+    clearInterval(iv);SFX.good();
+    const rec=s>state.balanceRecord;
+    if(rec)state.balanceRecord=s;
+    save();checkAch();
+    openModal('<div class="done-box"><div class="emoji3d">'+(rec?'🏆':'⏱')+'</div><h3 style="justify-content:center">'+(rec?'Novo recorde!':'Resultado')+'</h3><div class="quiz-score">'+s+'s</div><p class="mech-hint" style="margin-top:8px">Recorde: '+state.balanceRecord+'s</p><div class="row" style="margin-top:18px"><button class="btn" id="bs-again">↻ Tentar de novo</button><button class="btn ghost" id="bs-close">Fechar</button></div></div>');
+    $('#bs-again').onclick=openBalance;
+    $('#bs-close').onclick=closeModal;
+  };
+}
+
+/* ============================================================
+   ARTE DA SEDUÇÃO
+============================================================ */
+let sedStage=null;
+function sedStageDone(st){return (state.sedDone[st.id]||[]).length;}
+function sedUnlocked(id){const i=SED_STAGES.findIndex(x=>x.id===id);
+  if(i<=0)return true;
+  const prev=SED_STAGES[i-1];
+  return sedStageDone(prev)>=prev.momentos.length;}
+function renderSeducao(){
+  const wrap=$('#sed-wrap');
+  if(!sedStage){
+    wrap.innerHTML='<div class="level-grid">'+SED_STAGES.map(st=>{
+      const done=sedStageDone(st),total=st.momentos.length,un=sedUnlocked(st.id),complete=done>=total;
+      return '<button class="level-card'+(un?'':' locked')+(complete?' l-gold':'')+'" data-sed="'+st.id+'">'+
+        '<div class="l-ic">'+st.icon+'</div><h4>'+(complete?'✓ ':'')+st.name+'</h4><p>'+st.sub+'</p>'+
+        (un?'<div class="l-prog"><div class="progress"><i style="width:'+(done/total*100)+'%"></i></div><p style="margin-top:7px;font-size:12px">'+done+'/'+total+' momentos vividos</p></div>'
+           :'<div class="l-lock">🔒 Viva a etapa anterior para abrir esta</div>')+
+        '</button>';
+    }).join('')+'</div>';
+    $$('#sed-wrap [data-sed]').forEach(b=>b.onclick=()=>{
+      const id=b.getAttribute('data-sed');SFX.click();
+      if(sedUnlocked(id)){sedStage=id;renderSeducao();}
+      else{SFX.bad();toast('Viva a etapa anterior para desbloquear esta.','🔒');}
+    });
+  }else{
+    const st=SED_STAGES.find(x=>x.id===sedStage),done=sedStageDone(st),total=st.momentos.length;
+    wrap.innerHTML='<div class="deck-top"><div class="dt-info"><span class="deck-count">'+st.icon+' Etapa: '+st.name+'</span><div class="progress"><i style="width:'+(done/total*100)+'%"></i></div></div><button class="btn ghost small" id="sed-back">Voltar às etapas</button></div>'+
+      '<div class="mission-list">'+st.momentos.map((m,i)=>{
+        const ok=(state.sedDone[st.id]||[]).includes(i),km=SED_KIND_META[m.kind];
+        return '<button class="mission-card'+(ok?' done':'')+'" data-sm="'+i+'">'+
+          '<span class="m-num">'+(ok?'✓':(i+1))+'</span>'+
+          '<span class="m-body"><h4>'+m.t+'</h4><p>'+km.ic+' '+km.n+'</p></span>'+
+          '<span class="m-st">'+(ok?'🌟':'▶')+'</span></button>';
+      }).join('')+'</div>';
+    $('#sed-back').onclick=()=>{SFX.click();sedStage=null;renderSeducao();};
+    $$('#sed-wrap [data-sm]').forEach(b=>b.onclick=()=>openSedMomento(st,parseInt(b.getAttribute('data-sm'),10)));
+  }
+}
+function openSedMomento(st,i){
+  const m=st.momentos[i];
+  if(m.kind==='carta'){
+    openModal('<h3>'+st.icon+' '+st.name+' <span class="mind-chip">Carta Surpresa</span></h3>'+
+      '<div class="t-type t-v">🃏 Carta</div>'+
+      '<div class="t-text" style="font-size:19px">'+m.x+'</div>'+
+      (m.s?'<p class="m-desc">'+m.s+'</p>':'')+
+      '<div class="row" style="margin-top:16px"><button class="btn" id="sm-ok">💭 Revelada · +2</button></div>');
+    $('#sm-ok').onclick=()=>finishSed(st,i,2);
+  }else if(m.kind==='situacao'){
+    openModal('<h3>'+st.icon+' '+st.name+' <span class="mind-chip">Situação</span></h3>'+
+      '<div class="quiz-q" style="font-size:18px">'+m.x+'</div>'+
+      '<div class="quiz-opts">'+m.opts.map((o,k)=>'<button class="quiz-opt" data-so="'+k+'">'+o.o+'</button>').join('')+'</div>'+
+      '<div id="sm-after"></div>');
+    $$('#modal-box [data-so]').forEach(b=>b.onclick=()=>{
+      const k=parseInt(b.getAttribute('data-so'),10);
+      $$('#modal-box [data-so]').forEach(x=>{x.disabled=true;if(x===b)x.classList.add('chosen');});
+      SFX.click();
+      $('#sm-after').innerHTML='<div class="quiz-why"><b>O que essa escolha diz:</b> '+m.opts[k].re+'</div>'+
+        '<div class="row" style="margin-top:14px"><button class="btn mint" id="sm-ok">🎭 Situação vivida · +3</button></div>';
+      $('#sm-ok').onclick=()=>finishSed(st,i,3);
+    });
+  }else{
+    openModal('<h3>'+st.icon+' '+st.name+' <span class="mind-chip">Desafio</span></h3>'+
+      '<div class="t-type t-m">🎯 Desafio Leve</div>'+
+      '<ol class="steps">'+m.steps.map(x=>'<li>'+x+'</li>').join('')+'</ol>'+
+      (m.timer?timerHTML('sdt',m.timer):'')+
+      '<div class="row" style="margin-top:14px"><button class="btn" id="sm-ok">✅ Cumprimos · +3</button></div>');
+    if(m.timer)mountTimer('sdt',m.timer);
+    $('#sm-ok').onclick=()=>finishSed(st,i,3);
+  }
+}
+function finishSed(st,i,pts){
+  const arr=state.sedDone[st.id]||[];
+  if(!arr.includes(i))arr.push(i);
+  state.sedDone[st.id]=arr;
+  const before=state.sedStages;
+  state.sedStages=SED_STAGES.filter(x=>sedStageDone(x)>=x.momentos.length).length;
+  save();
+  if(state.sedStages>before){SFX.unlock();addPoints(pts+8,'seducao');toast('Etapa "'+st.name+'" concluída! +8 de bônus','🎉');}
+  else{addPoints(pts,'seducao');}
+  closeModal();renderSeducao();
+}
+
+/* ============================================================
+   ROLETA DO PRAZER
+============================================================ */
+let wheelRot=0,wheelBusy=false;
+function renderRoleta(){
+  $('#roleta-wrap').innerHTML='<div class="roleta-stage">'+
+    '<div class="wheel-zone"><div class="wheel-pointer">▼</div>'+
+    '<div class="wheel" id="wheel">'+ROLETA_SEGS.map((s,i)=>'<div class="wl" style="--a:'+(i*60+30)+'deg"><span class="we">'+s.ic+'</span><span class="wt">'+s.n+'</span></div>').join('')+'</div>'+
+    '<button class="wheel-hub" id="btn-spin">GIRAR</button></div>'+
+    '<div class="roleta-info">🎡 <b>'+state.roletaSpins+'</b> rodadas · Sequência de desafios: <b>'+(state.roletaStreak>0?'🔥 x'+state.roletaStreak:'—')+'</b> · Recorde: <b>'+state.roletaStreakBest+'</b></div>'+
+    '<p class="mech-hint" style="margin-top:10px">3 desafios cumpridos em sequência = bônus de fogo +5.</p>'+
+  '</div>';
+  const w=$('#wheel');if(w)w.style.transform='rotate('+wheelRot+'deg)';
+  $('#btn-spin').onclick=spinWheel;
+}
+function spinWheel(){
+  const wheel=$('#wheel');if(wheelBusy||!wheel)return;
+  wheelBusy=true;
+  const hub=$('#btn-spin');if(hub)hub.disabled=true;
+  SFX.click();
+  state.roletaSpins++;save();checkAch();
+  const i=Math.floor(Math.random()*ROLETA_SEGS.length);
+  const jitter=Math.random()*40-20;
+  const want=((360-(i*60+30)+jitter)%360+360)%360;
+  const cur=((wheelRot%360)+360)%360;
+  wheelRot+=360*5+((want-cur+360)%360);
+  wheel.style.transform='rotate('+wheelRot+'deg)';
+  setTimeout(()=>{
+    wheelBusy=false;
+    if(!$('#screen-roleta').classList.contains('active'))return;
+    revealRoleta(i);
+  },4350);
+}
+function revealRoleta(i){
+  const seg=ROLETA_SEGS[i],item=seg.items[Math.floor(Math.random()*seg.items.length)];
+  const pts=seg.id==='coroa'?6:4;
+  openModal('<h3>'+seg.ic+' '+seg.n+' <span class="mind-chip">Roleta do Prazer</span></h3>'+
+    '<div class="t-type t-m">✨ Surpresa</div>'+
+    '<div class="t-text" style="font-size:19px">'+item.s+'</div>'+
+    '<div class="tecnica-box">🎯 <b>Desafio opcional:</b> '+item.c+'</div>'+
+    '<div class="row" style="margin-top:16px"><button class="btn mint" id="rv-do">Cumprir · +'+pts+'</button><button class="btn ghost" id="rv-skip">Só a surpresa · +1</button></div>');
+  $('#rv-do').onclick=()=>{
+    state.roletaStreak++;state.roletaStreakBest=Math.max(state.roletaStreakBest,state.roletaStreak);save();
+    addPoints(pts,'roleta');SFX.unlock();
+    if(state.roletaStreak===3){addPoints(5,'roleta');toast('🔥 Sequência de Fogo! +5 de bônus','🔥');}
+    rvDone(true);
+  };
+  $('#rv-skip').onclick=()=>{state.roletaStreak=0;save();addPoints(1,'roleta');rvDone(false);};
+}
+function rvDone(did){
+  openModal('<div class="done-box"><div class="emoji3d">'+(did?'💖':'✨')+'</div><h3 style="justify-content:center">'+(did?'Sintonia acesa!':'Momento leve')+'</h3>'+
+    '<p class="mech-hint" style="margin-top:8px">Sequência de desafios: '+(state.roletaStreak>0?'🔥 x'+state.roletaStreak:'— reiniciada')+'</p>'+
+    '<div class="row" style="margin-top:16px"><button class="btn" id="rv-again">🎡 Girar de novo</button><button class="btn ghost" id="rv-close">Fechar</button></div></div>');
+  $('#rv-again').onclick=()=>{SFX.click();closeModal();renderRoleta();spinWheel();};
+  $('#rv-close').onclick=()=>{SFX.click();closeModal();renderRoleta();};
+}
+
+/* ============================================================
+   ACADEMIA DA INTIMIDADE
+============================================================ */
+let acadState=null;
+function acadLvlIdx(xp){return xp>=LVL_THRESH[3]?3:xp>=LVL_THRESH[2]?2:xp>=LVL_THRESH[1]?1:0;}
+function renderAcademia(){
+  const xp=state.acadXP,li=acadLvlIdx(xp);
+  const curTh=LVL_THRESH[li],nextTh=li<3?LVL_THRESH[li+1]:66;
+  const pct=li<3?Math.max(6,Math.min(100,(xp-curTh)/(nextTh-curTh)*100)):100;
+  $('#acad-wrap').innerHTML='<div class="acad-head">'+
+    '<span class="mind-chip">'+LVL_ICONS[li]+' '+LVL_NAMES[li]+' · '+xp+' XP</span>'+
+    '<div class="progress"><i style="width:'+pct+'%"></i></div>'+
+    '<span class="mech-hint">'+(li<3?'Próximo nível em '+Math.max(0,nextTh-xp)+' XP':'Nível máximo alcançado!')+'</span></div>'+
+    '<div class="mission-list">'+ACADEMY.map(m=>{
+      const done=!!state.acadDone[m.id];
+      return '<button class="mission-card'+(done?' done':'')+'" data-ac="'+m.id+'">'+
+        '<span class="m-num">'+(done?'✓':m.icon)+'</span>'+
+        '<span class="m-body"><h4>'+m.name+'</h4><p>'+m.sub+'</p></span>'+
+        '<span class="m-st">'+(done?'🎓':'▶')+'</span></button>';
+    }).join('')+'</div>'+
+    '<p class="mech-hint" style="margin-top:14px">Cada acerto vale +2 XP · cada módulo concluído pela primeira vez, +5 XP de bônus.</p>';
+  $$('#acad-wrap [data-ac]').forEach(b=>b.onclick=()=>{
+    SFX.click();acadState={mod:b.getAttribute('data-ac'),i:0,score:0};acadQ();
+  });
+}
+function acadQ(){
+  const m=ACADEMY.find(x=>x.id===acadState.mod),q=m.qs[acadState.i];
+  openModal('<h3>'+m.icon+' '+m.name+' <span class="mind-chip">'+(acadState.i+1)+'/'+m.qs.length+'</span></h3>'+
+    '<div class="quiz-prog"><div class="progress"><i style="width:'+(acadState.i/m.qs.length*100)+'%"></i></div><span>✓ '+acadState.score+'</span></div>'+
+    '<div class="quiz-q" style="font-size:18.5px">'+q.q+'</div>'+
+    '<div class="quiz-opts">'+q.o.map((o,i)=>'<button class="quiz-opt" data-aq="'+i+'">'+o+'</button>').join('')+'</div>'+
+    '<div id="aq-after"></div>');
+  $$('#modal-box [data-aq]').forEach(b=>b.onclick=()=>{
+    const i=parseInt(b.getAttribute('data-aq'),10);
+    $$('#modal-box .quiz-opt').forEach(x=>{x.disabled=true;if(x.getAttribute('data-aq')==q.c)x.classList.add('correct');});
+    if(i===q.c){acadState.score++;SFX.good();}
+    else{b.classList.add('wrong');SFX.bad();}
+    acadState.i++;
+    $('#aq-after').innerHTML='<div class="quiz-why"><b>Por quê?</b> '+q.w+'</div>'+
+      '<div class="row" style="margin-top:14px"><button class="btn" id="aq-next">'+(acadState.i>=m.qs.length?'Ver curiosidade →':'Próxima →')+'</button></div>';
+    $('#aq-next').onclick=()=>{SFX.click();acadState.i>=m.qs.length?acadEnd():acadQ();};
+  });
+}
+function acadEnd(){
+  const m=ACADEMY.find(x=>x.id===acadState.mod);
+  const first=!state.acadDone[m.id];
+  const gain=acadState.score*2+(first?5:0);
+  if(first){state.acadDone[m.id]=true;state.acadMods++;}
+  state.acadXP+=gain;save();checkAch();
+  const li=acadLvlIdx(state.acadXP);
+  openModal('<div class="done-box"><div class="emoji3d">'+(acadState.score===m.qs.length?'🎓':(acadState.score>0?'📚':'🧠'))+'</div>'+
+    '<h3 style="justify-content:center">'+m.name+'</h3>'+
+    '<div class="quiz-score">'+acadState.score+'/'+m.qs.length+'</div>'+
+    '<div class="quiz-why" style="text-align:left"><b>✨ Curiosidade:</b> '+m.curiosidade+'</div>'+
+    '<p class="mech-hint" style="margin-top:12px">+'+gain+' XP · Nível atual: '+LVL_ICONS[li]+' '+LVL_NAMES[li]+' ('+state.acadXP+' XP)</p>'+
+    '<div class="row" style="margin-top:16px"><button class="btn" id="aq-close">Continuar</button></div></div>');
+  $('#aq-close').onclick=()=>{SFX.click();closeModal();renderAcademia();};
+  if(gain>0){SFX.good();toast('+'+gain+' XP na Academia','🎓');}
+}
+
+/* ============================================================
+   DESBLOQUEIE A INTIMIDADE
+============================================================ */
+function renderDesbloqueio(){
+  const done=UNLOCK.filter(p=>state.unlDone[p.id]).length;
+  $('#unl-wrap').innerHTML='<div class="acad-head"><span class="mind-chip">🔓 Nível de conhecimento: '+done+'/'+UNLOCK.length+'</span></div>'+
+    '<div class="journey">'+UNLOCK.map((p,i)=>{
+      const d=!!state.unlDone[p.id],un=i===0||!!state.unlDone[UNLOCK[i-1].id],cur=!d&&un;
+      return '<div class="jnode'+(d?' done':cur?' cur':' locked')+'" data-un="'+p.id+'" role="button" tabindex="0">'+
+        '<span class="j-dot">'+(d?'✓':p.icon)+'</span>'+
+        '<div class="j-node-body"><h4>'+p.name+' <span class="ex-meta">'+(d?'concluída · selo: '+p.selo:(cur?'disponível':'bloqueada'))+'</span></h4>'+
+        '<p>'+(d||cur?p.li:'Complete a fase anterior para revelar esta lição.')+'</p></div></div>';
+    }).join('')+'</div>'+
+    '<p class="mech-hint" style="margin-top:16px">Cada fase concluída vale +6 de sintonia e um selo para a jornada de vocês.</p>';
+  $$('#unl-wrap [data-un]').forEach(n=>n.onclick=()=>{
+    const id=n.getAttribute('data-un'),i=UNLOCK.findIndex(x=>x.id===id);
+    const un=i===0||!!state.unlDone[UNLOCK[i-1].id];
+    if(un){SFX.click();openUnlPhase(id);}
+    else{SFX.bad();toast('Complete a fase anterior primeiro.','🔒');}
+  });
+}
+function openUnlPhase(id){
+  const p=UNLOCK.find(x=>x.id===id);
+  openModal('<h3>'+p.icon+' Fase: '+p.name+'</h3>'+
+    '<div class="tecnica-box">📖 <b>Lição:</b> '+p.li+'</div>'+
+    '<div class="adapt-box"><h5>🔓 Recompensa desta fase</h5><ul><li>'+p.rec+'</li></ul></div>'+
+    '<ol class="steps">'+p.passos.map(x=>'<li>'+x+'</li>').join('')+'</ol>'+
+    (p.timer?timerHTML('unt',p.timer):'')+
+    '<div class="row" style="margin-top:16px"><button class="btn" id="un-done">Fase concluída · +6</button></div>');
+  if(p.timer)mountTimer('unt',p.timer);
+  $('#un-done').onclick=()=>{
+    state.unlDone[p.id]=true;
+    state.unlPhases=UNLOCK.filter(x=>state.unlDone[x.id]).length;save();
+    SFX.unlock();toast('🏅 Selo desbloqueado: '+p.selo,'🏅');
+    addPoints(6,'desbloqueio');
+    closeModal();renderDesbloqueio();
+    if(state.unlPhases>=UNLOCK.length){
+      openModal('<div class="done-box"><div class="emoji3d">🌌</div><h3 style="justify-content:center">Jornada Completa!</h3>'+
+        '<p class="m-desc" style="text-align:center">Vocês passaram pelas 6 fases e desbloquearam todos os selos. Intimidade é prática — recomecem quando quiserem: cada jornada é nova.</p>'+
+        '<div class="row" style="margin-top:16px"><button class="btn gold" id="un-fin">✦ Continuar</button></div></div>');
+      $('#un-fin').onclick=closeModal;
+    }
+  };
+}
+
+/* ============ NAVEGAÇÃO / INIT ============ */
+function openGame(id){
+  SFX.click();
+  if(id==='desejos'){renderDesejos();}
+  if(id==='sentidos'){renderSentidos();}
+  if(id==='movimento'){renderMovimento();}
+  if(id==='seducao'){renderSeducao();}
+  if(id==='roleta'){renderRoleta();}
+  if(id==='academia'){renderAcademia();}
+  if(id==='desbloqueio'){renderDesbloqueio();}
+  show('screen-'+id);
+}
+function updateMute(){$('#btn-mute').textContent=state.muted?'🔇':'🔊';}
+
+document.addEventListener('DOMContentLoaded',function(){
+  $$('.gcard').forEach(c=>c.onclick=()=>openGame(c.getAttribute('data-open')));
+  $$('[data-back]').forEach(b=>b.onclick=()=>{SFX.click();goHome();});
+  $('#btn-home').onclick=()=>{SFX.click();goHome();};
+  $('#btn-mute').onclick=()=>{state.muted=!state.muted;save();updateMute();if(!state.muted)SFX.good();};
+  $('#btn-reset').onclick=()=>{
+    openModal('<h3>↺ Recomeçar do zero</h3><p class="m-desc">Isso apaga pontos, níveis, chaves e conquistas. A noite de vocês começa de novo — tem certeza?</p><div class="row" style="margin-top:14px"><button class="btn" id="rs-yes">Sim, zerar tudo</button><button class="btn ghost" id="rs-no">Cancelar</button></div>');
+    $('#rs-yes').onclick=()=>{try{localStorage.removeItem(KEY);}catch(e){}location.reload();};
+    $('#rs-no').onclick=closeModal;
+  };
+  updateMute();
+  renderHome();
+});
+</script>
+</body>
+</html>
